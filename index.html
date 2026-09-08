@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Podgląd Zabezpieczenia Trasy (Live)</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link class="styles" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+}
+
+#panel {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 340px;
+    bottom: 0;
+    background: white;
+    overflow-y: auto;
+    border-right: 1px solid #ccc;
+    padding: 15px;
+    box-sizing: border-box;
+    z-index: 9999;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+#map {
+    position: absolute;
+    left: 340px;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+#toggle-view-btn {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10000;
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 30px;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.section-title {
+    margin-top: 15px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    text-transform: uppercase;
+    color: #555;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 3px;
+}
+
+.custom-marker-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px !important;
+    height: 24px !important;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    color: white;
+    font-size: 11px;
+    text-align: center;
+}
+
+.icon-wolontariusz { background: #007bff; }
+.icon-lider       { background: #17a2b8; border-radius: 4px; }
+.icon-ochrona      { background: #dc3545; border-color: #ffc107; }
+.icon-ruchem       { background: #004085; }
+.icon-medyczny     { background: #28a745; }
+.icon-ploty        { background: #343a40; border-color: #f8f9fa; }
+.icon-toaleta      { background: #6f42c1; }
+.icon-zywieniowy   { background: #fd7e14; }
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+.filter-item input { margin-right: 6px; }
+
+.stat-table {
+    width: 100%;
+    font-size: 12px;
+    border-collapse: collapse;
+    margin-top: 5px;
+}
+.stat-table th, .stat-table td {
+    border: 1px solid #eee;
+    padding: 4px;
+    text-align: left;
+}
+.stat-table th { background: #f8f9fa; }
+
+.search-box {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.pointItem {
+    border: 1px solid #ddd;
+    margin-bottom: 6px;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    background: #fff;
+    font-size: 13px;
+    transition: background 0.2s;
+}
+.pointItem:hover { background: #f1f3f5; }
+
+.badge-sector {
+    background: #e9ecef;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.popup-view b { font-size: 14px; display: block; margin-bottom: 5px; }
+.popup-view div { font-size: 12px; margin-bottom: 3px; }
+
+#loading-status {
+    background: #fff3cd;
+    color: #856404;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #ffeeba;
+}
+
+#live-sync-badge {
+    float: right;
+    font-size: 11px;
+    background: #e6f4ea;
+    color: #137333;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+@media (max-width: 767px) {
+    #panel {
+        width: 100%;
+        top: auto;
+        bottom: 0;
+        height: 45vh;
+        border-right: none;
+        border-top: 2px solid #ccc;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
+        z-index: 999;
+    }
+    #map {
+        left: 0;
+        width: 100%;
+        height: 55vh;
+    }
+    #toggle-view-btn {
+        display: block;
+    }
+    .panel-expanded #panel {
+        height: 90vh;
+    }
+    .panel-expanded #map {
+        height: 10vh;
+    }
+    .pointItem {
+        padding: 12px;
+        margin-bottom: 8px;
+    }
+    .filter-item {
+        font-size: 14px;
+        padding: 6px 0;
+    }
+    .filter-item input {
+        width: 18px;
+        height: 18px;
+    }
+    #pointList {
+        max-height: 200px !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<button id="toggle-view-btn" onclick="toggleMobileView()"><i class="fa-solid fa-list"></i> Pokaż Listę</button>
+
+<div id="panel">
+    <span id="live-sync-badge"><i class="fa-solid fa-rotate"></i> Live: 30s</span>
+    <h2 id="projectTitle" style="margin-top:0; margin-bottom:10px; font-size:18px; color:#333;">Ładowanie...</h2>
+    
+    <div id="loading-status">Trwa pobieranie danych z GitHub...</div>
+
+    <!-- PRZYCISK LOKALIZACJI GPS -->
+    <button id="locate-btn" onclick="toggleGPS()" style="width: 100%; padding: 10px; margin-bottom: 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; transition: background 0.2s;">
+        <i class="fa-solid fa-crosshairs"></i> Włącz moją lokalizację (GPS)
+    </button>
+
+    <div class="section-title">Legenda tras</div>
+    <div id="routeLegendContainer" style="font-size:12px; padding: 5px; background: #f8f9fa; border-radius: 4px; border: 1px solid #ddd;"></div>
+
+    <div class="section-title">Filtrowanie punktów</div>
+    <div id="filterContainer" style="max-height: 120px; overflow-y: auto; background:#f8f9fa; padding:5px; border-radius:4px; border:1px solid #ddd;"></div>
+
+    <div class="section-title">Wyszukiwarka</div>
+    <input type="text" id="searchPointInput" class="search-box" placeholder="Szukaj numeru np. LID-002..." oninput="searchPoints()">
+
+    <div class="section-title">Statystyki Live</div>
+    <table class="stat-table">
+        <thead>
+            <tr><th>Typ</th><th>Ilość</th><th>Obsada (os.)</th></tr>
+        </thead>
+        <tbody id="statTableBody"></tbody>
+    </table>
+
+    <div class="section-title">Lista punktów (<span id="pointsCount">0</span>)</div>
+    <div id="pointList" style="max-height:300px; overflow-y:auto; margin-top:5px;"></div>
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/togeojson/0.16.0/togeojson.min.js"></script>
+
+<script>
+// Bezpieczeństwo - ochrona przed XSS
+function escapeHtml(str) {
+    if (typeof str !== 'string') return str;
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+const CONFIG_TYPES = {
+    "Wolontariusz":      { className: "icon-wolontariusz", faIcon: "fa-solid fa-user",          color: "#007bff" },
+    "Lider":             { className: "icon-lider",        faIcon: "fa-solid fa-bullhorn",      color: "#17a2b8" },
+    "Ochrona":          { className: "icon-ochrona",      faIcon: "fa-solid fa-shield-halved", color: "#dc3545" },
+    "Kierowanie ruchem": { className: "icon-ruchem",       faIcon: "fa-solid fa-car",           color: "#004085" },
+    "Medyczny":          { className: "icon-medyczny",     faIcon: "fa-solid fa-heart-pulse",   color: "#28a745" },
+    "Płoty":             { className: "icon-ploty",        faIcon: "fa-solid fa-road-barrier",  color: "#343a40" },
+    "Toaleta":           { className: "icon-toaleta",      faIcon: "fa-solid fa-restroom",      color: "#6f42c1" },
+    "Punkt żywieniowy":  { className: "icon-zywieniowy",   faIcon: "fa-solid fa-droplet",       color: "#fd7e14" }
+};
+
+// Konfiguracja tras: 5K (Fioletowy), 10K (Żółty)
+const CONFIG_ROUTES = {
+    "5K":  { file: "trasa_5K.gpx",  color: "#6f42c1", layer: null },
+    "10K": { file: "trasa_10K.gpx", color: "#ffc107", layer: null },
+    "SM":  { file: "trasa_sm.gpx",  color: "#007bff", layer: null },
+    "HM":  { file: "trasa_hm.gpx",  color: "#dc3545", layer: null },
+    "UM":  { file: "trasa_um.gpx",  color: "#20c997", layer: null }
+};
+
+const map = L.map('map', { tap: false }).setView([50.2649, 19.0238], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+// Inicjalizacja warstw tras i automatycznej legendy
+const legendContainer = document.getElementById("routeLegendContainer");
+Object.keys(CONFIG_ROUTES).forEach(key => {
+    CONFIG_ROUTES[key].layer = L.geoJSON(null, {
+        style: { color: CONFIG_ROUTES[key].color, weight: 5 }
+    }).addTo(map);
+
+    if (legendContainer) {
+        legendContainer.innerHTML += `
+            <div style="color: ${CONFIG_ROUTES[key].color}; font-weight:bold; margin-bottom:2px;">
+                <i class="fa-solid fa-route"></i> Trasa ${key}
+            </div>
+        `;
+    }
+});
+
+let pointsMap = new Map();
+let activeFilters = {};
+let isFirstLoad = true;
+
+// Zmienne obsługi GPS
+let myLocationMarker = null;
+let myLocationCircle = null;
+let watchId = null;
+
+function toggleGPS() {
+    const btn = document.getElementById("locate-btn");
+
+    if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+        
+        if (myLocationMarker) { map.removeLayer(myLocationMarker); myLocationMarker = null; }
+        if (myLocationCircle) { map.removeLayer(myLocationCircle); myLocationCircle = null; }
+        
+        btn.innerHTML = `<i class="fa-solid fa-crosshairs"></i> Włącz moją lokalizację (GPS)`;
+        btn.style.background = "#28a745";
+        btn.style.color = "#fff";
+    } else {
+        if (!navigator.geolocation) {
+            alert("Twoja przeglądarka lub urządzenie nie obsługuje geolokalizacji.");
+            return;
+        }
+
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Szukam sygnału GPS...`;
+        btn.style.background = "#ffc107";
+        btn.style.color = "#000";
+
+        watchId = navigator.geolocation.watchPosition(
+            (pos) => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                const accuracy = pos.coords.accuracy;
+
+                if (!myLocationMarker) {
+                    myLocationMarker = L.circleMarker([lat, lng], {
+                        radius: 8,
+                        fillColor: "#007bff",
+                        color: "#ffffff",
+                        weight: 3,
+                        opacity: 1,
+                        fillOpacity: 0.9
+                    }).addTo(map).bindPopup("<b>Twoja obecna pozycja</b>");
+
+                    myLocationCircle = L.circle([lat, lng], {
+                        radius: accuracy,
+                        color: "#007bff",
+                        fillColor: "#007bff",
+                        fillOpacity: 0.15,
+                        weight: 1
+                    }).addTo(map);
+
+                    map.setView([lat, lng], 16);
+                } else {
+                    myLocationMarker.setLatLng([lat, lng]);
+                    myLocationCircle.setLatLng([lat, lng]);
+                    myLocationCircle.setRadius(accuracy);
+                }
+
+                btn.innerHTML = `<i class="fa-solid fa-location-dot"></i> Wyłącz śledzenie GPS`;
+                btn.style.background = "#dc3545";
+                btn.style.color = "#fff";
+            },
+            (err) => {
+                alert("Nie udało się pobrać lokalizacji. Upewnij się, że zezwoliłeś na dostęp do GPS.");
+                toggleGPS();
+            },
+            {
+                enableHighAccuracy: true,
+                maximumAge: 5000,
+                timeout: 10000
+            }
+        );
+    }
+}
+
+function toggleMobileView() {
+    const body = document.body;
+    const btn = document.getElementById("toggle-view-btn");
+    if (body.classList.contains("panel-expanded")) {
+        body.classList.remove("panel-expanded");
+        btn.innerHTML = `<i class="fa-solid fa-list"></i> Pokaż Listę`;
+    } else {
+        body.classList.add("panel-expanded");
+        btn.innerHTML = `<i class="fa-solid fa-map"></i> Pokaż Mapę`;
+    }
+    setTimeout(() => { map.invalidateSize(); }, 320);
+}
+
+function initFilters() {
+    const container = document.getElementById("filterContainer");
+    container.innerHTML = "";
+    Object.keys(CONFIG_TYPES).forEach(type => {
+        activeFilters[type] = true;
+        const div = document.createElement("div");
+        div.className = "filter-item";
+        div.innerHTML = `
+            <input type="checkbox" id="filter_${type}" checked onchange="toggleFilter('${type}', this.checked)">
+            <span style="display:inline-block; width:14px; text-align:center; margin-right:5px; color:${CONFIG_TYPES[type].color};"><i class="${CONFIG_TYPES[type].faIcon}"></i></span>
+            <label for="filter_${type}" style="cursor:pointer; font-weight:bold;">${type}</label>
+        `;
+        container.appendChild(div);
+    });
+}
+initFilters();
+
+function toggleFilter(type, isVisible) {
+    activeFilters[type] = isVisible;
+    pointsMap.forEach(p => {
+        if (p.typ === type) {
+            if (isVisible) { if (!map.hasLayer(p.marker)) p.marker.addTo(map); }
+            else { if (map.hasLayer(p.marker)) map.removeLayer(p.marker); }
+        }
+    });
+    refreshList();
+    updateStats();
+}
+
+async function loadGpxRoutes() {
+    for (const key of Object.keys(CONFIG_ROUTES)) {
+        try {
+            const randToken = Math.random().toString(36).substring(2);
+            const response = await fetch(`${CONFIG_ROUTES[key].file}?v=${randToken}`);
+            if (!response.ok) throw new Error();
+            const gpxText = await response.text();
+            const parser = new DOMParser();
+            const gpxXml = parser.parseFromString(gpxText, "text/xml");
+            const geojson = toGeoJSON.gpx(gpxXml);
+            CONFIG_ROUTES[key].layer.clearLayers();
+            CONFIG_ROUTES[key].layer.addData(geojson);
+        } catch (e) { }
+    }
+}
+
+async function syncPointsData() {
+    const badge = document.getElementById("live-sync-badge");
+    badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Pobieranie...`;
+    
+    try {
+        const antiCacheString = Math.random().toString(36).substring(2, 10);
+        const response = await fetch(`punkty.json?nocache=${antiCacheString}`, {
+            method: 'GET',
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        });
+        
+        if (!response.ok) throw new Error("Nie znaleziono pliku");
+        const data = await response.json();
+        
+        if (data.projectName) {
+            document.getElementById("projectTitle").innerText = data.projectName;
+        }
+
+        const pointsArray = data.points || (Array.isArray(data) ? data : []);
+        const incomingIds = new Set();
+
+        pointsArray.forEach((p, index) => {
+            let typ = p.typ;
+            if (typ === "Policja") typ = "Kierowanie ruchem";
+            if (typ === "Koordynator") typ = "Lider";
+            if (!CONFIG_TYPES[typ]) return;
+
+            const pointId = p.id || p.numer || `pt_${index}`;
+            incomingIds.add(pointId);
+
+            const safeData = {
+                id: pointId,
+                typ: typ,
+                numer: escapeHtml(p.numer || ""),
+                sektor: escapeHtml(p.sektor || ""),
+                liczba_osob: Number(p.liczba_osob) || 0,
+                telefon: escapeHtml(p.telefon || ""),
+                uwagi: escapeHtml(p.uwagi || ""),
+                lat: Number(p.lat),
+                lng: Number(p.lng)
+            };
+
+            if (pointsMap.has(pointId)) {
+                updateExistingMarker(pointId, safeData);
+            } else {
+                createNewMarker(pointId, safeData);
+            }
+        });
+
+        pointsMap.forEach((point, id) => {
+            if (!incomingIds.has(id)) {
+                map.removeLayer(point.marker);
+                pointsMap.delete(id);
+            }
+        });
+
+        document.getElementById("loading-status").style.display = "none";
+        badge.style.background = "#e6f4ea";
+        badge.style.color = "#137333";
+        badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Live: OK`;
+        
+        refreshList();
+        updateStats();
+
+        if (isFirstLoad) {
+            fitMapToAll();
+            isFirstLoad = false;
+        }
+
+    } catch (e) {
+        badge.style.background = "#fce8e6";
+        badge.style.color = "#c5221f";
+        badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Błąd Live`;
+        if (isFirstLoad) {
+            document.getElementById("loading-status").innerHTML = `<span style="color:red;"><i class="fa-solid fa-triangle-exclamation"></i> Brak pliku 'punkty.json'.</span>`;
+            document.getElementById("projectTitle").innerText = "Brak pliku danych";
+        }
+    }
+}
+
+function getPopupContent(cfg, typ, safeData) {
+    return `
+        <div class="popup-view" style="width:220px">
+            <b style="color:${cfg.color};"><i class="${cfg.faIcon}"></i> ${typ}</b>
+            <div><b>ID:</b> ${safeData.numer}</div>
+            ${safeData.sektor ? `<div><b>Sektor:</b> ${safeData.sektor}</div>` : ''}
+            <div><b>Obsada:</b> ${safeData.liczba_osob} os.</div>
+            ${safeData.telefon ? `<div><b>Tel:</b> <a href="tel:${safeData.telefon}">${safeData.telefon}</a></div>` : ''}
+            ${safeData.uwagi ? `<div style="margin-top:5px; border-top:1px solid #eee; padding-top:3px; font-style:italic; color:#555;">${safeData.uwagi}</div>` : ''}
+        </div>
+    `;
+}
+
+function createNewMarker(id, p) {
+    const cfg = CONFIG_TYPES[p.typ];
+    const customIcon = L.divIcon({
+        className: `custom-marker-icon ${cfg.className}`,
+        html: `<div><i class="${cfg.faIcon}"></i></div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+    });
+
+    const marker = L.marker([p.lat, p.lng], { icon: customIcon });
+    marker.bindPopup(getPopupContent(cfg, p.typ, p));
+
+    if (activeFilters[p.typ]) {
+        marker.addTo(map);
+    }
+
+    pointsMap.set(id, { ...p, marker });
+}
+
+function updateExistingMarker(id, p) {
+    const existing = pointsMap.get(id);
+    const cfg = CONFIG_TYPES[p.typ];
+
+    if (existing.lat !== p.lat || existing.lng !== p.lng) {
+        existing.marker.setLatLng([p.lat, p.lng]);
+    }
+
+    existing.marker.setPopupContent(getPopupContent(cfg, p.typ, p));
+    pointsMap.set(id, { ...p, marker: existing.marker });
+}
+
+function fitMapToAll() {
+    const bounds = L.latLngBounds([]);
+    let hasData = false;
+    Object.keys(CONFIG_ROUTES).forEach(key => {
+        const layer = CONFIG_ROUTES[key].layer;
+        if (layer.getLayers().length > 0) {
+            bounds.extend(layer.getBounds());
+            hasData = true;
+        }
+    });
+    if (pointsMap.size > 0) {
+        pointsMap.forEach(p => bounds.extend([p.lat, p.lng]));
+        hasData = true;
+    }
+    if (hasData) map.fitBounds(bounds);
+}
+
+function refreshList() {
+    let html = "";
+    const searchVal = document.getElementById("searchPointInput").value.toLowerCase().trim();
+
+    pointsMap.forEach((p, id) => {
+        if (!activeFilters[p.typ]) return;
+        if (searchVal && !p.numer.toLowerCase().includes(searchVal)) return;
+
+        html += `
+        <div class="pointItem" onclick="focusPoint('${id}')" style="border-left: 5px solid ${CONFIG_TYPES[p.typ].color};">
+            <b><i class="${CONFIG_TYPES[p.typ].faIcon}"></i> ${p.typ}</b> - <span style="font-weight:bold;">${p.numer}</span>
+            ${p.sektor ? `<span class="badge-sector">Sek: ${p.sektor}</span>` : ''}
+            <br>
+            <small style="display:block; margin:2px 0; color:#555;">
+                ${p.liczba_osob ? `Obsada: <b>${p.liczba_osob} os.</b>` : ''} 
+                ${p.telefon ? ` | Tel: ${p.telefon}` : ''}
+            </small>
+            <small style="color:#666; font-style:italic;">${p.uwagi ? p.uwagi : 'Brak uwag.'}</small>
+        </div>
+        `;
+    });
+
+    document.getElementById("pointList").innerHTML = html;
+    
+    let activeCount = 0;
+    pointsMap.forEach(p => { if (activeFilters[p.typ]) activeCount++; });
+    document.getElementById("pointsCount").innerText = activeCount;
+}
+
+function focusPoint(id) {
+    const point = pointsMap.get(id);
+    if (!point) return;
+    if (document.body.classList.contains("panel-expanded")) {
+        document.body.classList.remove("panel-expanded");
+        document.getElementById("toggle-view-btn").innerHTML = `<i class="fa-solid fa-list"></i> Pokaż Listę`;
+        setTimeout(() => { map.invalidateSize(); }, 300);
+    }
+    map.setView([point.lat, point.lng], 17);
+    point.marker.openPopup();
+}
+
+function searchPoints() { refreshList(); }
+
+function updateStats() {
+    let html = "";
+    let grandTotalPoints = 0;
+    let grandTotalPeople = 0;
+
+    Object.keys(CONFIG_TYPES).forEach(type => {
+        let countPoints = 0;
+        let countPeople = 0;
+
+        pointsMap.forEach(p => {
+            if (p.typ === type) {
+                countPoints++;
+                countPeople += (p.liczba_osob || 0);
+            }
+        });
+
+        grandTotalPoints += countPoints;
+        grandTotalPeople += countPeople;
+
+        if (countPoints > 0) {
+            html += `<tr><td><span style="color:${CONFIG_TYPES[type].color}; margin-right:5px;"><i class="${CONFIG_TYPES[type].faIcon}"></i></span>${type}</td><td><b>${countPoints}</b></td><td>${countPeople}</td></tr>`;
+        }
+    });
+
+    if (grandTotalPoints > 0) {
+        html += `<tr style="background:#e9ecef; font-weight:bold; border-top:2px solid #ccc;"><td>RAZEM</td><td>${grandTotalPoints}</td><td>${grandTotalPeople}</td></tr>`;
+    } else {
+        html = `<tr><td colspan="3" style="text-align:center; color:#999;">Brak punktów</td></tr>`;
+    }
+    document.getElementById("statTableBody").innerHTML = html;
+}
+
+window.onload = async function() {
+    await loadGpxRoutes();
+    await syncPointsData();
+    
+    setInterval(async () => {
+        await syncPointsData();
+    }, 30000);
+};
+</script>
+
+</body>
+</html>
