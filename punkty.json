@@ -1,11 +1,6 @@
 {
   "projectName": "Silesia Marathon 2026",
-  "generatedAt": "2026-09-17T17:47:48.294Z",
-  "drawnRoutes": {
-    "SM": [],
-    "HM": [],
-    "UM": []
-  },
+  "generatedAt": "2026-09-24T18:47:01.047Z",
   "points": [
     {
       "typ": "Wolontariusz",
@@ -1268,8 +1263,8 @@
       "lng": 19.039714336395267
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-084",
+      "typ": "Ochrona",
+      "numer": "OCHR-300",
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
       "telefon": "",
@@ -1278,8 +1273,8 @@
       "lng": 19.04255747795105
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-085",
+      "typ": "Ochrona",
+      "numer": "OCHR-301",
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
       "telefon": "",
@@ -1470,7 +1465,7 @@
     {
       "typ": "Wolontariusz",
       "numer": "WOL-108",
-      "sektor": "Odcinek 1",
+      "sektor": "Odcinek 4",
       "liczba_osob": 1,
       "telefon": "",
       "uwagi": "Mapa 140",
@@ -1819,16 +1814,6 @@
     },
     {
       "typ": "Płoty",
-      "numer": "PLOT-034",
-      "sektor": "Odcinek 1",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 22",
-      "lat": 50.266372412357725,
-      "lng": 19.015674015047008
-    },
-    {
-      "typ": "Płoty",
       "numer": "PLOT-035",
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
@@ -1866,16 +1851,6 @@
       "uwagi": "Mapa 24",
       "lat": 50.26402553853713,
       "lng": 19.024161239419907
-    },
-    {
-      "typ": "Płoty",
-      "numer": "PLOT-039",
-      "sektor": "Odcinek 1",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 25",
-      "lat": 50.2639431908058,
-      "lng": 19.02693367579067
     },
     {
       "typ": "Płoty",
@@ -1969,16 +1944,6 @@
     },
     {
       "typ": "Płoty",
-      "numer": "PLOT-049",
-      "sektor": "Odcinek 1",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 28",
-      "lat": 50.25768417583842,
-      "lng": 19.036106191545727
-    },
-    {
-      "typ": "Płoty",
       "numer": "PLOT-050",
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
@@ -2026,16 +1991,6 @@
       "uwagi": "Mapa 31",
       "lat": 50.252794237549864,
       "lng": 19.03453137077758
-    },
-    {
-      "typ": "Płoty",
-      "numer": "PLOT-060",
-      "sektor": "Odcinek 1",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 31",
-      "lat": 50.25279252156906,
-      "lng": 19.03410504835693
     },
     {
       "typ": "Płoty",
@@ -2109,16 +2064,6 @@
     },
     {
       "typ": "Płoty",
-      "numer": "PLOT-068",
-      "sektor": "Odcinek 1",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 36A",
-      "lat": 50.24498945032427,
-      "lng": 19.038030697958437
-    },
-    {
-      "typ": "Płoty",
       "numer": "PLOT-069",
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
@@ -2163,7 +2108,7 @@
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
       "telefon": "",
-      "uwagi": "Mapa 44A",
+      "uwagi": "Mapa 39A",
       "lat": 50.241919407537104,
       "lng": 19.036104559449107
     },
@@ -2409,16 +2354,6 @@
     },
     {
       "typ": "Płoty",
-      "numer": "PLOT-094",
-      "sektor": "Odcinek 1",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 32",
-      "lat": 50.25153048132496,
-      "lng": 19.02988145735515
-    },
-    {
-      "typ": "Płoty",
       "numer": "PLOT-095",
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
@@ -2448,8 +2383,8 @@
       "lng": 19.053307099685682
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-114",
+      "typ": "Ochrona",
+      "numer": "OCHR-302",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
@@ -2458,8 +2393,8 @@
       "lng": 19.042851191923436
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-115",
+      "typ": "Ochrona",
+      "numer": "OCHR-303",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
@@ -2538,8 +2473,8 @@
       "lng": 19.026206473479856
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-116",
+      "typ": "Ochrona",
+      "numer": "OCHR-304",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
@@ -2548,8 +2483,8 @@
       "lng": 19.045145223595178
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-117",
+      "typ": "Ochrona",
+      "numer": "OCHR-305",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
@@ -2558,8 +2493,8 @@
       "lng": 19.045249539772396
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-118",
+      "typ": "Ochrona",
+      "numer": "OCHR-306",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
@@ -2568,8 +2503,8 @@
       "lng": 19.046896518123816
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-119",
+      "typ": "Ochrona",
+      "numer": "OCHR-307",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
@@ -2578,8 +2513,8 @@
       "lng": 19.04708152596674
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-120",
+      "typ": "Ochrona",
+      "numer": "OCHR-308",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
@@ -2588,8 +2523,8 @@
       "lng": 19.04723167725954
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-121",
+      "typ": "Ochrona",
+      "numer": "OCHR-309",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
@@ -2598,8 +2533,8 @@
       "lng": 19.04708475288647
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-122",
+      "typ": "Ochrona",
+      "numer": "OCHR-310",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
@@ -2608,8 +2543,8 @@
       "lng": 19.047044533790178
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-123",
+      "typ": "Ochrona",
+      "numer": "OCHR-311",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
@@ -2618,8 +2553,8 @@
       "lng": 19.047232229457705
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-124",
+      "typ": "Ochrona",
+      "numer": "OCHR-312",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
@@ -2628,8 +2563,8 @@
       "lng": 19.04836921185278
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-125",
+      "typ": "Ochrona",
+      "numer": "OCHR-313",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
@@ -6033,7 +5968,7 @@
       "sektor": "Odcinek 4",
       "liczba_osob": 1,
       "telefon": "",
-      "uwagi": "Mapa 121",
+      "uwagi": "Mapa 104",
       "lat": 50.30066195652925,
       "lng": 19.03097794532717
     },
@@ -7428,8 +7363,8 @@
       "lng": 18.977500498294834
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-304",
+      "typ": "Ochrona",
+      "numer": "OCHR-314",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
@@ -7438,8 +7373,8 @@
       "lng": 19.02947602807776
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-305",
+      "typ": "Ochrona",
+      "numer": "OCHR-315",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
@@ -7448,8 +7383,8 @@
       "lng": 19.033114275285108
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-306",
+      "typ": "Ochrona",
+      "numer": "OCHR-316",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
@@ -7458,8 +7393,8 @@
       "lng": 19.03039010182989
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-307",
+      "typ": "Ochrona",
+      "numer": "OCHR-317",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
@@ -7520,7 +7455,7 @@
     {
       "typ": "Wolontariusz",
       "numer": "WOL-308",
-      "sektor": "Odcirnek 1",
+      "sektor": "Odcinek 1",
       "liczba_osob": 1,
       "telefon": "",
       "uwagi": "Mapa U8",
@@ -7550,7 +7485,7 @@
     {
       "typ": "Wolontariusz",
       "numer": "WOL-311",
-      "sektor": "Odcinek",
+      "sektor": "Odcinek 1",
       "liczba_osob": 1,
       "telefon": "",
       "uwagi": "Mapa U17",
@@ -7578,9 +7513,9 @@
       "lng": 19.03016030788422
     },
     {
-      "typ": "Ochrona",
-      "numer": "OCHR-061",
-      "sektor": "Odcienek 4",
+      "typ": "Płoty",
+      "numer": "PLOT-400",
+      "sektor": "Odcinek 4",
       "liczba_osob": 1,
       "telefon": "",
       "uwagi": "Mapa 121",
@@ -7616,6 +7551,16 @@
       "uwagi": "Mapa 21",
       "lat": 50.267570495664906,
       "lng": 19.011304378509525
+    },
+    {
+      "typ": "Ochrona",
+      "numer": "OCHR-318",
+      "sektor": "Odcinek 1",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Mapa 49",
+      "lat": 50.25058070355819,
+      "lng": 19.049767255783085
     }
   ]
 }
