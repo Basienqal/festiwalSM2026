@@ -1,6 +1,11 @@
 {
   "projectName": "Silesia Marathon 2026",
-  "generatedAt": "2026-09-24T18:47:01.047Z",
+  "generatedAt": "2026-09-30T19:02:46.279Z",
+  "drawnRoutes": {
+    "SM": [],
+    "HM": [],
+    "UM": []
+  },
   "points": [
     {
       "typ": "Wolontariusz",
@@ -2609,8 +2614,8 @@
       "liczba_osob": 1,
       "telefon": "",
       "uwagi": "Mapa 48A",
-      "lat": 50.25193672083534,
-      "lng": 19.04717620069384
+      "lat": 50.252254211102304,
+      "lng": 19.0472674369812
     },
     {
       "typ": "Kierowanie ruchem",
@@ -2821,16 +2826,6 @@
       "uwagi": "Mapa 53",
       "lat": 50.2388639468776,
       "lng": 19.06435765295025
-    },
-    {
-      "typ": "Wolontariusz",
-      "numer": "WOL-134",
-      "sektor": "Odcinek 2",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 53",
-      "lat": 50.24012726118697,
-      "lng": 19.070417330124254
     },
     {
       "typ": "Wolontariusz",
@@ -6423,16 +6418,6 @@
       "lng": 19.017709078084575
     },
     {
-      "typ": "Wolontariusz",
-      "numer": "WOL-267",
-      "sektor": "Odcinek 4",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 129A",
-      "lat": 50.285983681627265,
-      "lng": 19.017619499936195
-    },
-    {
       "typ": "Płoty",
       "numer": "PLOT-252",
       "sektor": "Odcinek 4",
@@ -7024,26 +7009,6 @@
     },
     {
       "typ": "Wolontariusz",
-      "numer": "WOL-289",
-      "sektor": "Odcinek 1",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa U4",
-      "lat": 50.28039383904084,
-      "lng": 18.997588312058824
-    },
-    {
-      "typ": "Wolontariusz",
-      "numer": "WOL-290",
-      "sektor": "Odcinek 1",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa U5",
-      "lat": 50.28351421847391,
-      "lng": 19.000609823240044
-    },
-    {
-      "typ": "Wolontariusz",
       "numer": "WOL-291",
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
@@ -7561,6 +7526,76 @@
       "uwagi": "Mapa 49",
       "lat": 50.25058070355819,
       "lng": 19.049767255783085
+    },
+    {
+      "typ": "Ochrona",
+      "numer": "OCHR-319",
+      "sektor": "Odcinek 4",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Między mapą 102 a 103",
+      "lat": 50.27343352710207,
+      "lng": 19.049662649631504
+    },
+    {
+      "typ": "Kierowanie ruchem",
+      "numer": "RUCH-109",
+      "sektor": "Odcinek 2",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Brak mapy",
+      "lat": 50.25200724644177,
+      "lng": 19.050292968750004
+    },
+    {
+      "typ": "Ochrona",
+      "numer": "OCHR-320",
+      "sektor": "Odcinek 2",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Mapa 53",
+      "lat": 50.239931857555135,
+      "lng": 19.070495367050174
+    },
+    {
+      "typ": "Ochrona",
+      "numer": "OCHR-321",
+      "sektor": "Odcinek 4",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Mapa 129A",
+      "lat": 50.285863757485004,
+      "lng": 19.017720222473148
+    },
+    {
+      "typ": "Ochrona",
+      "numer": "OCHR-322",
+      "sektor": "Odcinek 1",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Mapa U4  8:00 pracownik przechodzi na telewizyjną (pracownik kierowania ruchem). Jest to osoba o której 6:30 gotowość.",
+      "lat": 50.28029009530444,
+      "lng": 18.997142314910892
+    },
+    {
+      "typ": "Ochrona",
+      "numer": "OCHR-323",
+      "sektor": "Odcinek 1",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Mapa U5 o 8:00 pracownik przechodzi na telewizyjną (pracownik kierowania ruchem). Jest to osoba o której 6:30 gotowość.",
+      "lat": 50.28370429793016,
+      "lng": 19.000146389007572
+    },
+    {
+      "typ": "Ochrona",
+      "numer": "OCHR-324",
+      "sektor": "Odcinek 1",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Mapa U6 o 8:00 pracownik BX1 przechodzi na telewizyjną (pracownik służby porządkowej). Jest to osoba o której 6:30 gotowość.",
+      "lat": 50.29169038165946,
+      "lng": 18.998515605926517
     }
   ]
 }
