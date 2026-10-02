@@ -1,6 +1,6 @@
 {
   "projectName": "Silesia Marathon 2026",
-  "generatedAt": "2026-09-30T19:02:46.279Z",
+  "generatedAt": "2026-10-02T20:00:38.738Z",
   "drawnRoutes": {
     "SM": [],
     "HM": [],
@@ -2606,16 +2606,6 @@
       "uwagi": "Mapa 48",
       "lat": 50.250456478874696,
       "lng": 19.048581264536992
-    },
-    {
-      "typ": "Kierowanie ruchem",
-      "numer": "PLOT-103",
-      "sektor": "Odcinek 2",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 48A",
-      "lat": 50.252254211102304,
-      "lng": 19.0472674369812
     },
     {
       "typ": "Kierowanie ruchem",
@@ -6598,16 +6588,6 @@
       "lng": 18.999381559796607
     },
     {
-      "typ": "Ochrona",
-      "numer": "OCHR-041",
-      "sektor": "Odcinek 4",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 133",
-      "lat": 50.29214920089849,
-      "lng": 18.999218002138388
-    },
-    {
       "typ": "Wolontariusz",
       "numer": "WOL-271",
       "sektor": "Odcinek 4",
@@ -6726,36 +6706,6 @@
       "uwagi": "Mapa 138",
       "lat": 50.29504637816582,
       "lng": 18.983686658588734
-    },
-    {
-      "typ": "Ochrona",
-      "numer": "OCHR-043",
-      "sektor": "Odcinek 4",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 138",
-      "lat": 50.29393658893442,
-      "lng": 18.983107301441517
-    },
-    {
-      "typ": "Ochrona",
-      "numer": "OCHR-044",
-      "sektor": "Odcinek 4",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 139",
-      "lat": 50.2931547711363,
-      "lng": 18.98246379590094
-    },
-    {
-      "typ": "Ochrona",
-      "numer": "OCHR-045",
-      "sektor": "Odcinek 4",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 139",
-      "lat": 50.29228485606334,
-      "lng": 18.981980762424126
     },
     {
       "typ": "Płoty",
@@ -7023,7 +6973,7 @@
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
       "telefon": "",
-      "uwagi": "Mapa U6",
+      "uwagi": "Mapa U6=133",
       "lat": 50.292286064584886,
       "lng": 18.99947466684252
     },
@@ -7083,7 +7033,7 @@
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
       "telefon": "",
-      "uwagi": "Mapa U11",
+      "uwagi": "Mapa U11=138",
       "lat": 50.293906361332695,
       "lng": 18.98296333631246
     },
@@ -7093,9 +7043,9 @@
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
       "telefon": "",
-      "uwagi": "Mapa U12",
-      "lat": 50.29314168831367,
-      "lng": 18.982657671180693
+      "uwagi": "Mapa U12=139",
+      "lat": 50.29315721533606,
+      "lng": 18.982572555541996
     },
     {
       "typ": "Ochrona",
@@ -7103,9 +7053,9 @@
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
       "telefon": "",
-      "uwagi": "Mapa U12",
-      "lat": 50.29223298018148,
-      "lng": 18.982116054017332
+      "uwagi": "Mapa U12=139",
+      "lat": 50.292266169919664,
+      "lng": 18.982009291648865
     },
     {
       "typ": "Płoty",
@@ -7596,6 +7546,36 @@
       "uwagi": "Mapa U6 o 8:00 pracownik BX1 przechodzi na telewizyjną (pracownik służby porządkowej). Jest to osoba o której 6:30 gotowość.",
       "lat": 50.29169038165946,
       "lng": 18.998515605926517
+    },
+    {
+      "typ": "Kierowanie ruchem",
+      "numer": "RUCH-110",
+      "sektor": "Odcinek 2",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "",
+      "lat": 50.252100363726285,
+      "lng": 19.047181606292725
+    },
+    {
+      "typ": "Ochrona",
+      "numer": "OCHR-325",
+      "sektor": "Odcinek 3",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Obsluga przejazdu",
+      "lat": 50.259462495859935,
+      "lng": 19.094393849372867
+    },
+    {
+      "typ": "Ochrona",
+      "numer": "OCHR-326",
+      "sektor": "Odcinek 3",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Obsługa przejazdu",
+      "lat": 50.2589094583826,
+      "lng": 19.094275832176212
     }
   ]
 }
