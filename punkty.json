@@ -1,11 +1,6 @@
 {
   "projectName": "Silesia Marathon 2026",
-  "generatedAt": "2026-10-02T19:45:40.152Z",
-  "drawnRoutes": {
-    "SM": [],
-    "HM": [],
-    "UM": []
-  },
+  "generatedAt": "2026-09-24T18:47:01.047Z",
   "points": [
     {
       "typ": "Wolontariusz",
@@ -2609,7 +2604,7 @@
     },
     {
       "typ": "Kierowanie ruchem",
-      "numer": "RUCH-200",
+      "numer": "PLOT-103",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
@@ -6618,6 +6613,16 @@
       "lng": 18.999381559796607
     },
     {
+      "typ": "Ochrona",
+      "numer": "OCHR-041",
+      "sektor": "Odcinek 4",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Mapa 133",
+      "lat": 50.29214920089849,
+      "lng": 18.999218002138388
+    },
+    {
       "typ": "Wolontariusz",
       "numer": "WOL-271",
       "sektor": "Odcinek 4",
@@ -6736,6 +6741,36 @@
       "uwagi": "Mapa 138",
       "lat": 50.29504637816582,
       "lng": 18.983686658588734
+    },
+    {
+      "typ": "Ochrona",
+      "numer": "OCHR-043",
+      "sektor": "Odcinek 4",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Mapa 138",
+      "lat": 50.29393658893442,
+      "lng": 18.983107301441517
+    },
+    {
+      "typ": "Ochrona",
+      "numer": "OCHR-044",
+      "sektor": "Odcinek 4",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Mapa 139",
+      "lat": 50.2931547711363,
+      "lng": 18.98246379590094
+    },
+    {
+      "typ": "Ochrona",
+      "numer": "OCHR-045",
+      "sektor": "Odcinek 4",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Mapa 139",
+      "lat": 50.29228485606334,
+      "lng": 18.981980762424126
     },
     {
       "typ": "Płoty",
@@ -7023,7 +7058,7 @@
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
       "telefon": "",
-      "uwagi": "Mapa U6= Mapa 133",
+      "uwagi": "Mapa U6",
       "lat": 50.292286064584886,
       "lng": 18.99947466684252
     },
@@ -7083,7 +7118,7 @@
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
       "telefon": "",
-      "uwagi": "Mapa U11=133",
+      "uwagi": "Mapa U11",
       "lat": 50.293906361332695,
       "lng": 18.98296333631246
     },
@@ -7093,9 +7128,9 @@
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
       "telefon": "",
-      "uwagi": "Mapa U12=139",
-      "lat": 50.293167504438166,
-      "lng": 18.982513546943668
+      "uwagi": "Mapa U12",
+      "lat": 50.29314168831367,
+      "lng": 18.982657671180693
     },
     {
       "typ": "Ochrona",
@@ -7103,9 +7138,9 @@
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
       "telefon": "",
-      "uwagi": "Mapa U12=139",
-      "lat": 50.29224559520933,
-      "lng": 18.98195028305054
+      "uwagi": "Mapa U12",
+      "lat": 50.29223298018148,
+      "lng": 18.982116054017332
     },
     {
       "typ": "Płoty",
@@ -7526,26 +7561,6 @@
       "uwagi": "Mapa 49",
       "lat": 50.25058070355819,
       "lng": 19.049767255783085
-    },
-    {
-      "typ": "Ochrona",
-      "numer": "OCHR-319",
-      "sektor": "",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "przejazd pod wiaduktem",
-      "lat": 50.261236849689745,
-      "lng": 19.094769358634952
-    },
-    {
-      "typ": "Ochrona",
-      "numer": "OCHR-320",
-      "sektor": "",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Przejazd przed wiaduktem",
-      "lat": 50.261531091657,
-      "lng": 19.094898104667664
     }
   ]
 }
