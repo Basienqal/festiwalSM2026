@@ -1,6 +1,6 @@
 {
   "projectName": "Silesia Marathon 2026",
-  "generatedAt": "2026-09-30T19:02:46.279Z",
+  "generatedAt": "2026-10-02T19:45:40.152Z",
   "drawnRoutes": {
     "SM": [],
     "HM": [],
@@ -2609,13 +2609,13 @@
     },
     {
       "typ": "Kierowanie ruchem",
-      "numer": "PLOT-103",
+      "numer": "RUCH-200",
       "sektor": "Odcinek 2",
       "liczba_osob": 1,
       "telefon": "",
       "uwagi": "Mapa 48A",
-      "lat": 50.252254211102304,
-      "lng": 19.0472674369812
+      "lat": 50.25193672083534,
+      "lng": 19.04717620069384
     },
     {
       "typ": "Kierowanie ruchem",
@@ -2826,6 +2826,16 @@
       "uwagi": "Mapa 53",
       "lat": 50.2388639468776,
       "lng": 19.06435765295025
+    },
+    {
+      "typ": "Wolontariusz",
+      "numer": "WOL-134",
+      "sektor": "Odcinek 2",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Mapa 53",
+      "lat": 50.24012726118697,
+      "lng": 19.070417330124254
     },
     {
       "typ": "Wolontariusz",
@@ -6418,6 +6428,16 @@
       "lng": 19.017709078084575
     },
     {
+      "typ": "Wolontariusz",
+      "numer": "WOL-267",
+      "sektor": "Odcinek 4",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Mapa 129A",
+      "lat": 50.285983681627265,
+      "lng": 19.017619499936195
+    },
+    {
       "typ": "Płoty",
       "numer": "PLOT-252",
       "sektor": "Odcinek 4",
@@ -6598,16 +6618,6 @@
       "lng": 18.999381559796607
     },
     {
-      "typ": "Ochrona",
-      "numer": "OCHR-041",
-      "sektor": "Odcinek 4",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 133",
-      "lat": 50.29214920089849,
-      "lng": 18.999218002138388
-    },
-    {
       "typ": "Wolontariusz",
       "numer": "WOL-271",
       "sektor": "Odcinek 4",
@@ -6726,36 +6736,6 @@
       "uwagi": "Mapa 138",
       "lat": 50.29504637816582,
       "lng": 18.983686658588734
-    },
-    {
-      "typ": "Ochrona",
-      "numer": "OCHR-043",
-      "sektor": "Odcinek 4",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 138",
-      "lat": 50.29393658893442,
-      "lng": 18.983107301441517
-    },
-    {
-      "typ": "Ochrona",
-      "numer": "OCHR-044",
-      "sektor": "Odcinek 4",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 139",
-      "lat": 50.2931547711363,
-      "lng": 18.98246379590094
-    },
-    {
-      "typ": "Ochrona",
-      "numer": "OCHR-045",
-      "sektor": "Odcinek 4",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 139",
-      "lat": 50.29228485606334,
-      "lng": 18.981980762424126
     },
     {
       "typ": "Płoty",
@@ -7009,6 +6989,26 @@
     },
     {
       "typ": "Wolontariusz",
+      "numer": "WOL-289",
+      "sektor": "Odcinek 1",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Mapa U4",
+      "lat": 50.28039383904084,
+      "lng": 18.997588312058824
+    },
+    {
+      "typ": "Wolontariusz",
+      "numer": "WOL-290",
+      "sektor": "Odcinek 1",
+      "liczba_osob": 1,
+      "telefon": "",
+      "uwagi": "Mapa U5",
+      "lat": 50.28351421847391,
+      "lng": 19.000609823240044
+    },
+    {
+      "typ": "Wolontariusz",
       "numer": "WOL-291",
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
@@ -7023,7 +7023,7 @@
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
       "telefon": "",
-      "uwagi": "Mapa U6",
+      "uwagi": "Mapa U6= Mapa 133",
       "lat": 50.292286064584886,
       "lng": 18.99947466684252
     },
@@ -7083,7 +7083,7 @@
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
       "telefon": "",
-      "uwagi": "Mapa U11",
+      "uwagi": "Mapa U11=133",
       "lat": 50.293906361332695,
       "lng": 18.98296333631246
     },
@@ -7093,9 +7093,9 @@
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
       "telefon": "",
-      "uwagi": "Mapa U12",
-      "lat": 50.29314168831367,
-      "lng": 18.982657671180693
+      "uwagi": "Mapa U12=139",
+      "lat": 50.293167504438166,
+      "lng": 18.982513546943668
     },
     {
       "typ": "Ochrona",
@@ -7103,9 +7103,9 @@
       "sektor": "Odcinek 1",
       "liczba_osob": 1,
       "telefon": "",
-      "uwagi": "Mapa U12",
-      "lat": 50.29223298018148,
-      "lng": 18.982116054017332
+      "uwagi": "Mapa U12=139",
+      "lat": 50.29224559520933,
+      "lng": 18.98195028305054
     },
     {
       "typ": "Płoty",
@@ -7530,72 +7530,22 @@
     {
       "typ": "Ochrona",
       "numer": "OCHR-319",
-      "sektor": "Odcinek 4",
+      "sektor": "",
       "liczba_osob": 1,
       "telefon": "",
-      "uwagi": "Między mapą 102 a 103",
-      "lat": 50.27343352710207,
-      "lng": 19.049662649631504
-    },
-    {
-      "typ": "Kierowanie ruchem",
-      "numer": "RUCH-109",
-      "sektor": "Odcinek 2",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Brak mapy",
-      "lat": 50.25200724644177,
-      "lng": 19.050292968750004
+      "uwagi": "przejazd pod wiaduktem",
+      "lat": 50.261236849689745,
+      "lng": 19.094769358634952
     },
     {
       "typ": "Ochrona",
       "numer": "OCHR-320",
-      "sektor": "Odcinek 2",
+      "sektor": "",
       "liczba_osob": 1,
       "telefon": "",
-      "uwagi": "Mapa 53",
-      "lat": 50.239931857555135,
-      "lng": 19.070495367050174
-    },
-    {
-      "typ": "Ochrona",
-      "numer": "OCHR-321",
-      "sektor": "Odcinek 4",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa 129A",
-      "lat": 50.285863757485004,
-      "lng": 19.017720222473148
-    },
-    {
-      "typ": "Ochrona",
-      "numer": "OCHR-322",
-      "sektor": "Odcinek 1",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa U4  8:00 pracownik przechodzi na telewizyjną (pracownik kierowania ruchem). Jest to osoba o której 6:30 gotowość.",
-      "lat": 50.28029009530444,
-      "lng": 18.997142314910892
-    },
-    {
-      "typ": "Ochrona",
-      "numer": "OCHR-323",
-      "sektor": "Odcinek 1",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa U5 o 8:00 pracownik przechodzi na telewizyjną (pracownik kierowania ruchem). Jest to osoba o której 6:30 gotowość.",
-      "lat": 50.28370429793016,
-      "lng": 19.000146389007572
-    },
-    {
-      "typ": "Ochrona",
-      "numer": "OCHR-324",
-      "sektor": "Odcinek 1",
-      "liczba_osob": 1,
-      "telefon": "",
-      "uwagi": "Mapa U6 o 8:00 pracownik BX1 przechodzi na telewizyjną (pracownik służby porządkowej). Jest to osoba o której 6:30 gotowość.",
-      "lat": 50.29169038165946,
-      "lng": 18.998515605926517
+      "uwagi": "Przejazd przed wiaduktem",
+      "lat": 50.261531091657,
+      "lng": 19.094898104667664
     }
   ]
 }
