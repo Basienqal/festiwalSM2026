@@ -2,11 +2,11 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Podgląd Zabezpieczenia Trasy (Live)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Podgląd Zabezpieczenia Trasy (Live GPS)</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<link class="styles" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
 
 <style>
 body {
@@ -68,28 +68,61 @@ body {
     padding-bottom: 3px;
 }
 
+/* Stylizacja markerów na mapie */
 .custom-marker-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px !important;
-    height: 24px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 26px !important;
+    height: 26px !important;
     border: 2px solid #fff;
     border-radius: 50%;
     box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-    color: white;
-    font-size: 11px;
+    color: white !important;
+    font-size: 12px;
     text-align: center;
+    overflow: hidden;
+    background-color: #fff;
 }
 
-.icon-wolontariusz { background: #007bff; }
-.icon-lider       { background: #17a2b8; border-radius: 4px; }
-.icon-ochrona      { background: #dc3545; border-color: #ffc107; }
-.icon-ruchem       { background: #004085; }
+.custom-marker-icon svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+}
+
+.icon-wolontariusz { border: 2px solid #007bff !important; }
+.icon-lider        { border: 2px solid #dc3545 !important; }
+.icon-ochrona      { border: 2px solid #d2d826 !important; }
+.icon-ruchem       { border: 2px solid #e84824 !important; }
 .icon-medyczny     { background: #28a745; }
 .icon-ploty        { background: #343a40; border-color: #f8f9fa; }
 .icon-toaleta      { background: #6f42c1; }
 .icon-zywieniowy   { background: #fd7e14; }
+.icon-sedzia       { background: #e0a800; }
+.icon-sluza        { border: 2px solid #20c997 !important; }
+
+/* Styl dla użytkowników z aktywnym GPS Live */
+.icon-live-user {
+    background: #e83e8c;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    color: white;
+    box-shadow: 0 0 10px rgba(232, 62, 140, 0.8);
+    animation: pulse-live 2s infinite;
+}
+
+@keyframes pulse-live {
+    0% { box-shadow: 0 0 0 0 rgba(232, 62, 140, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(232, 62, 140, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(232, 62, 140, 0); }
+}
+
+/* Tryb generowania atlasu: czysty kadr bez kontrolek i pozycji GPS */
+body.atlas-mode .leaflet-control-container,
+body.atlas-mode .leaflet-marker-pane,
+body.atlas-mode .leaflet-popup-pane,
+body.atlas-mode .icon-live-user { display: none !important; }
 
 .filter-item {
     display: flex;
@@ -107,18 +140,27 @@ body {
 }
 .stat-table th, .stat-table td {
     border: 1px solid #eee;
-    padding: 4px;
+    padding: 6px;
     text-align: left;
 }
 .stat-table th { background: #f8f9fa; }
 
-.search-box {
+.search-box, .input-box {
     width: 100%;
     padding: 8px;
     box-sizing: border-box;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    font-size: 13px;
+}
+
+.gps-box {
+    background: #eef9ff;
+    border: 1px solid #b8daff;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 12px;
 }
 
 .pointItem {
@@ -133,17 +175,6 @@ body {
 }
 .pointItem:hover { background: #f1f3f5; }
 
-.badge-sector {
-    background: #e9ecef;
-    padding: 1px 4px;
-    border-radius: 3px;
-    font-size: 10px;
-    font-weight: bold;
-}
-
-.popup-view b { font-size: 14px; display: block; margin-bottom: 5px; }
-.popup-view div { font-size: 12px; margin-bottom: 3px; }
-
 #loading-status {
     background: #fff3cd;
     color: #856404;
@@ -152,6 +183,11 @@ body {
     font-size: 12px;
     margin-bottom: 10px;
     border: 1px solid #ffeeba;
+}
+#loading-status.error {
+    background: #f8d7da;
+    color: #721c24;
+    border-color: #f5c6cb;
 }
 
 #live-sync-badge {
@@ -163,6 +199,11 @@ body {
     border-radius: 10px;
     font-weight: bold;
 }
+#live-sync-badge.error { background: #f8d7da; color: #721c24; }
+#live-sync-badge.wait  { background: #eee; color: #555; }
+
+#gpsStatus { display:block; margin-top:6px; font-size:11px; color:#444; }
+#gpsStatus.error { color:#b02a37; font-weight:bold; }
 
 @media (max-width: 767px) {
     #panel {
@@ -180,30 +221,9 @@ body {
         width: 100%;
         height: 55vh;
     }
-    #toggle-view-btn {
-        display: block;
-    }
-    .panel-expanded #panel {
-        height: 90vh;
-    }
-    .panel-expanded #map {
-        height: 10vh;
-    }
-    .pointItem {
-        padding: 12px;
-        margin-bottom: 8px;
-    }
-    .filter-item {
-        font-size: 14px;
-        padding: 6px 0;
-    }
-    .filter-item input {
-        width: 18px;
-        height: 18px;
-    }
-    #pointList {
-        max-height: 200px !important;
-    }
+    #toggle-view-btn { display: block; }
+    .panel-expanded #panel { height: 90vh; }
+    .panel-expanded #map { height: 10vh; }
 }
 </style>
 </head>
@@ -213,173 +233,319 @@ body {
 <button id="toggle-view-btn" onclick="toggleMobileView()"><i class="fa-solid fa-list"></i> Pokaż Listę</button>
 
 <div id="panel">
-    <span id="live-sync-badge"><i class="fa-solid fa-rotate"></i> Live: 30s</span>
+    <span id="live-sync-badge" class="wait"><i class="fa-solid fa-rotate"></i> Dane: czekam...</span>
     <h2 id="projectTitle" style="margin-top:0; margin-bottom:10px; font-size:18px; color:#333;">Ładowanie...</h2>
-    
-    <div id="loading-status">Trwa pobieranie danych z GitHub...</div>
 
-    <!-- PRZYCISK LOKALIZACJI GPS -->
-    <button id="locate-btn" onclick="toggleGPS()" style="width: 100%; padding: 10px; margin-bottom: 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; transition: background 0.2s;">
-        <i class="fa-solid fa-crosshairs"></i> Włącz moją lokalizację (GPS)
-    </button>
+    <div id="loading-status">Trwa pobieranie danych...</div>
 
-    <div class="section-title">Legenda tras</div>
+    <!-- MOJA LOKALIZACJA (tylko podgląd na własnym urządzeniu) -->
+    <div class="gps-box">
+        <div style="font-weight:bold; font-size:12px; margin-bottom:5px; color:#004085;">
+            <i class="fa-solid fa-location-crosshairs"></i> Moja lokalizacja
+        </div>
+        <button id="locate-btn" onclick="toggleGPS()" style="width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
+            <i class="fa-solid fa-crosshairs"></i> Pokaż moją lokalizację
+        </button>
+        <button id="center-btn" onclick="centerOnMe()" style="display:none; width: 100%; padding: 8px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; margin-top: 5px;">
+            <i class="fa-solid fa-location-arrow"></i> Wyśrodkuj mapę na mnie
+        </button>
+        <span id="gpsStatus">Pozycja jest widoczna tylko na tym urządzeniu i nie jest nigdzie wysyłana.</span>
+    </div>
+
+    <!-- GENERATOR ATLASU OPERACYJNEGO -->
+    <div class="gps-box" style="background: #fff5f5; border-color: #f5c6cb;">
+        <div style="font-weight:bold; font-size:12px; margin-bottom:5px; color:#721c24;">
+            <i class="fa-solid fa-book-atlas"></i> Generator Atlasu (Skala 1:2000)
+        </div>
+        <select id="atlasRouteSelect" class="search-box" style="margin-bottom: 5px;">
+            <option value="SM">Trasa SM</option>
+            <option value="5K">Trasa 5K</option>
+            <option value="10K">Trasa 10K</option>
+            <option value="HM">Trasa HM</option>
+            <option value="UM">Trasa UM</option>
+        </select>
+        <button id="generateAtlasBtn" onclick="generateRouteAtlas()" style="width: 100%; padding: 10px; background: #e83e8c; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
+            <i class="fa-solid fa-file-pdf"></i> Pobierz Atlas Kilometrowy PDF
+        </button>
+        <button id="cancelAtlasBtn" onclick="cancelRouteAtlas()" style="display:none; width: 100%; padding: 8px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; margin-top: 5px;">
+            <i class="fa-solid fa-ban"></i> Przerwij generowanie
+        </button>
+        <div id="atlasProgress" style="font-size: 11px; color: #666; margin-top: 5px; text-align: center;"></div>
+    </div>
+
+    <div class="section-title">Legenda i włącznik tras</div>
     <div id="routeLegendContainer" style="font-size:12px; padding: 5px; background: #f8f9fa; border-radius: 4px; border: 1px solid #ddd;"></div>
 
     <div class="section-title">Filtrowanie punktów</div>
-    <div id="filterContainer" style="max-height: 120px; overflow-y: auto; background:#f8f9fa; padding:5px; border-radius:4px; border:1px solid #ddd;"></div>
+    <div id="filterContainer" style="max-height: 160px; overflow-y: auto; background:#f8f9fa; padding:5px; border-radius:4px; border:1px solid #ddd;"></div>
 
     <div class="section-title">Wyszukiwarka</div>
     <input type="text" id="searchPointInput" class="search-box" placeholder="Szukaj numeru np. LID-002..." oninput="searchPoints()">
 
-    <div class="section-title">Statystyki Live</div>
+    <div class="section-title">Podsumowanie punktów (Wszystkie)</div>
     <table class="stat-table">
         <thead>
-            <tr><th>Typ</th><th>Ilość</th><th>Obsada (os.)</th></tr>
+            <tr><th>Nazwa punktu</th><th>Liczba</th></tr>
         </thead>
         <tbody id="statTableBody"></tbody>
     </table>
 
     <div class="section-title">Lista punktów (<span id="pointsCount">0</span>)</div>
-    <div id="pointList" style="max-height:300px; overflow-y:auto; margin-top:5px;"></div>
+    <div id="pointList" style="max-height:250px; overflow-y:auto; margin-top:5px;"></div>
 </div>
 
 <div id="map"></div>
 
+<!-- Skrypty zewnętrzne (przypięte wersje) -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/togeojson/0.16.0/togeojson.min.js"></script>
+<script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-// Bezpieczeństwo - ochrona przed XSS
+// ---------- Pomocnicze ----------
 function escapeHtml(str) {
     if (typeof str !== 'string') return str;
-    return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
+function removePolishDiacritics(str) {
+    if (!str) return '';
+    const map = {
+        'ą': 'a', 'ć': 'c', 'ę': 'e', 'ł': 'l', 'ń': 'n', 'ó': 'o', 'ś': 's', 'ź': 'z', 'ż': 'z',
+        'Ą': 'A', 'Ć': 'C', 'Ę': 'E', 'Ł': 'L', 'Ń': 'N', 'Ó': 'O', 'Ś': 'S', 'Ź': 'Z', 'Ż': 'Z'
+    };
+    return str.replace(/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/g, match => map[match] || match);
+}
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const timeNow = () => new Date().toLocaleTimeString('pl-PL');
+
+function setDataBadge(state, text) {
+    const b = document.getElementById("live-sync-badge");
+    b.className = state === 'ok' ? '' : state;
+    b.innerHTML = `<i class="fa-solid fa-rotate"></i> ${text}`;
+}
+
+function setLoadingStatus(msg, isError) {
+    const el = document.getElementById("loading-status");
+    if (!msg) { el.style.display = "none"; return; }
+    el.style.display = "block";
+    el.className = isError ? "error" : "";
+    el.innerText = msg;
+}
+
+// Pętla odpytywania: bez nakładania się zapytań, wstrzymana gdy karta jest ukryta
+function startLoop(fn, ms) {
+    const run = async () => {
+        if (!document.hidden) {
+            try { await fn(); } catch (e) { console.error(e); }
+        }
+        setTimeout(run, ms);
+    };
+    setTimeout(run, ms);
+}
+
+// ---------- Ikony ----------
+let isAtlasCancelled = false;
+
+function cancelRouteAtlas() {
+    isAtlasCancelled = true;
+    document.getElementById("atlasProgress").innerText = "Przerywanie operacji...";
+}
+
+// Czyste SVG w pełni czytelne dla html2canvas
+const SVG_INFORMACYJNA_BLACK = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 119 168' width='16' height='16'><path d='M684.825,274.427C682.043,274.454 679.888,278.598 680.48,282.056C680.48,282.056 680.48,291.417 688.989,291.417C697.499,291.417 697.499,282.056 697.499,282.056C697.499,280.638 697.728,275.102 694.412,274.713M677.075,301.144L677.075,316.947L697.087,293.359C696.611,293.219 696.119,293.119 695.598,293.119L682.182,293.119C675.276,293.4 677.407,297.416 677.075,301.144ZM697.087,293.359L677.075,316.947L700.904,316.947L700.904,298.425C701.572,293.292 697.988,293.774 697.087,293.359ZM689.108,294.246C692.008,294.246 694.635,295.431 696.537,297.346C698.44,299.259 699.616,301.899 699.616,304.812C699.616,307.724 698.44,310.364 696.537,312.278C694.635,314.192 692.008,315.377 689.108,315.377C686.207,315.377 683.581,314.192 681.678,312.278C679.776,310.364 678.6,307.724 678.6,304.812C678.6,301.899 679.776,299.259 681.678,297.346C683.581,295.431 686.207,294.246 689.108,294.246ZM694.819,299.055C693.359,297.586 691.339,296.678 689.108,296.678C686.876,296.678 684.856,297.586 683.397,299.055C681.935,300.526 681.031,302.561 681.031,304.812C681.031,307.062 681.935,309.097 683.397,310.568C684.856,312.037 686.876,312.945 689.108,312.945C691.339,312.945 693.359,312.037 694.819,310.568C696.28,309.097 697.184,307.062 697.184,304.812C697.184,302.561 696.28,300.526 694.819,299.055ZM687.604,299.4L690.612,299.4L690.612,301.441L687.604,301.441L687.604,299.4ZM687.604,302.378L690.612,302.378L690.612,310.223L687.604,310.223L687.604,302.378Z' fill='#000000' transform='matrix(3.51264,0,0,3.92445,-2361.91,-1077.12)'/></svg>`;
+const SVG_RUCHEM_ORANGE = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 119 168' width='16' height='16'><path d='M642.638,109.482L658.992,109.482C656.224,108.391 653.665,106.211 650.69,106.211C647.793,106.211 645.322,108.391 642.638,109.482ZM642.638,111.117L642.638,115.205C642.638,115.205 642.638,124.2 650.815,124.2C658.992,124.2 658.992,115.205 658.992,115.205L658.992,111.117L642.638,111.117ZM629.504,115.978C627.7,116.006 626.26,117.49 626.284,119.294L626.284,132.377C626.284,134.47 628.221,136.024 630.265,135.571L639.368,133.546L639.368,147.137C641.899,143.92 655.945,125.835 655.665,125.835L644.274,125.835L632.826,128.301L632.826,119.294C632.851,117.45 631.348,115.949 629.504,115.978ZM659.775,126.333L642.462,148.731L662.263,148.731L662.263,130.933C662.905,126.001 660.641,126.733 659.775,126.333' fill='#e84824' transform='matrix(3.57579,0,0,3.995,-2244.93,-425.452)'/></svg>`;
+const SVG_PORZADKOWA = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 119 168' width='16' height='16'><g transform='matrix(3.53411,0,0,3.90062,-1655.02,-315.577)'><g transform='matrix(1,0,0,1,0,-390.34)'><path d='M485.478,471.54C477.903,471.424 475.748,475.568 476.339,479.026C476.339,479.026 476.339,488.386 484.849,488.386C493.359,488.386 493.359,479.026 493.359,479.026C493.359,477.607 493.588,472.072 485.478,471.54ZM492.577,490.021L478.041,490.088C471.136,490.369 473.267,494.385 472.936,498.113L472.898,513.916L496.763,513.916L496.763,495.394C497.432,490.261 494.598,490.368 492.577,490.021Z' fill='#d2d826' stroke='#0d070c' stroke-width='1.12px'/></g><g transform='matrix(1,0,0,1,0,-351.934)'><rect x='472.908' y='471.424' width='23.855' height='4.086' fill='#0d070c' stroke='#1c1917' stroke-width='0.63px'/></g><g transform='matrix(1,0,0,1,0,-375.78)'><rect x='484.001' y='475.501' width='2.251' height='19.779' fill='#0d070c' stroke='#1c1917' stroke-width='0.63px'/></g><text x='488.821px' y='108.702px' style="font-family:'Arial-Black', 'Arial', sans-serif;font-weight:900;font-size:9.713px;" fill='#1c1917'>S</text><g transform='matrix(1,0,0,1,0,-375.78)'><path d='M472.908,495.27L484.077,495.279L484.001,475.501' fill='none' stroke='#1c1917' stroke-width='0.63px'/></g><g transform='matrix(1,0,0,1,0,-375.79)'><path d='M496.679,495.27L486.252,495.289L486.177,475.501' fill='none' stroke='#1c1917' stroke-width='0.63px'/></g></g></svg>`;
+const SVG_TASMA = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='16' height='16'><g transform='rotate(-25 50 50)'><rect x='0' y='35' width='100' height='30' fill='#ffffff' stroke='#dc3545' stroke-width='2'/><path d='M 10 35 L 25 35 L 10 65 Z M 30 35 L 50 35 L 30 65 L 10 65 Z M 55 35 L 75 35 L 55 65 L 35 65 Z M 80 35 L 100 35 L 80 65 L 60 65 Z M 100 45 L 100 65 L 85 65 Z' fill='#dc3545'/></g></svg>`;
+const SVG_SLUZA = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='16' height='16'><g fill='#20c997'><path d='M 15 35 L 55 35 L 55 20 L 85 42.5 L 55 65 L 55 50 L 15 50 Z'/><path d='M 85 65 L 45 65 L 45 50 L 15 72.5 L 45 95 L 45 80 L 85 80 Z'/></g></svg>`;
+const SVG_MEDYCZNY = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='#ffffff'><path d='M19 10.5h-5.5V5h-3v5.5H5v3h5.5V19h3v-5.5H19z'/></svg>`;
+const SVG_BADIERKI = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='#ffffff'><path d='M20 6h-3V4c0-.55-.45-1-1-1H8c-.55 0-1 .45-1 1v2H4c-1.1 0-2 .9-2 2v11c0 .55.45 1 1 1h3v2c0 .55.45 1 1 1h8c.55 0 1-.45 1-2v-2h3c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM8 5h8v2H8V5zm8 14H8v-2h8v2zm3-4H5V9h14v6z'/></svg>`;
+const SVG_TOALETA = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='#ffffff'><path d='M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 7h-6v13h-2v-6h-2v6H9V9H3V7h18v2z'/></svg>`;
+const SVG_ZYWIENIOWY = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='#ffffff'><path d='M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z'/></svg>`;
+const SVG_SEDZIA = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='#ffffff'><path d='M12 2c1.1 0 2 .9 2 2v1.17c3.41.44 6 3.32 6 6.83 0 3.87-3.13 7-7 7s-7-3.13-7-7c0-3.51 2.59-6.39 6-6.83V4c0-1.1.9-2 2-2zm0 16c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-1-8h2v3h-2v-3zm0 4h2v2h-2v-2z'/></svg>`;
+const SVG_LIVE_USER = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='#ffffff'><path d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/></svg>`;
+
 const CONFIG_TYPES = {
-    "Wolontariusz":      { className: "icon-wolontariusz", faIcon: "fa-solid fa-user",          color: "#007bff" },
-    "Lider":             { className: "icon-lider",        faIcon: "fa-solid fa-bullhorn",      color: "#17a2b8" },
-    "Ochrona":          { className: "icon-ochrona",      faIcon: "fa-solid fa-shield-halved", color: "#dc3545" },
-    "Kierowanie ruchem": { className: "icon-ruchem",       faIcon: "fa-solid fa-car",           color: "#004085" },
-    "Medyczny":          { className: "icon-medyczny",     faIcon: "fa-solid fa-heart-pulse",   color: "#28a745" },
-    "Płoty":             { className: "icon-ploty",        faIcon: "fa-solid fa-road-barrier",  color: "#343a40" },
-    "Toaleta":           { className: "icon-toaleta",      faIcon: "fa-solid fa-restroom",      color: "#6f42c1" },
-    "Punkt żywieniowy":  { className: "icon-zywieniowy",   faIcon: "fa-solid fa-droplet",       color: "#fd7e14" }
+    "Służba informacyjna":      { className: "icon-wolontariusz", svgContent: SVG_INFORMACYJNA_BLACK, color: "#007bff" },
+    "Taśma":                    { className: "icon-lider",        svgContent: SVG_TASMA,               color: "#dc3545" },
+    "Służba porządkowa":        { className: "icon-ochrona",      svgContent: SVG_PORZADKOWA,          color: "#d2d826" },
+    "Służba kierowania ruchem": { className: "icon-ruchem",       svgContent: SVG_RUCHEM_ORANGE,       color: "#e84824" },
+    "Medyczny":                 { className: "icon-medyczny",     svgContent: SVG_MEDYCZNY,            color: "#28a745" },
+    "Barierki":                 { className: "icon-ploty",        svgContent: SVG_BADIERKI,            color: "#343a40" },
+    "Toaleta":                  { className: "icon-toaleta",      svgContent: SVG_TOALETA,             color: "#6f42c1" },
+    "Punkt żywieniowy":         { className: "icon-zywieniowy",   svgContent: SVG_ZYWIENIOWY,          color: "#fd7e14" },
+    "Sędzia":                   { className: "icon-sedzia",       svgContent: SVG_SEDZIA,              color: "#e0a800" },
+    "Śluza":                    { className: "icon-sluza",        svgContent: SVG_SLUZA,               color: "#20c997" }
 };
 
-// Konfiguracja tras: 5K (Fioletowy), 10K (Żółty)
 const CONFIG_ROUTES = {
     "5K":  { file: "trasa_5K.gpx",  color: "#6f42c1", layer: null },
     "10K": { file: "trasa_10K.gpx", color: "#ffc107", layer: null },
     "SM":  { file: "trasa_sm.gpx",  color: "#007bff", layer: null },
     "HM":  { file: "trasa_hm.gpx",  color: "#dc3545", layer: null },
-    "UM":  { file: "trasa_um26.gpx",  color: "#20c997", layer: null }
+    "UM":  { file: "trasa_um.gpx",  color: "#20c997", layer: null }
 };
 
-const map = L.map('map', { tap: false }).setView([50.2649, 19.0238], 13);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+// ---------- Mapa ----------
+// zoomSnap: 0 pozwala na ułamkowy zoom, niezbędny dla dokładnej skali 1:2000 w atlasie
+const map = L.map('map', { zoomSnap: 0, zoomDelta: 0.5, tap: false, zoomAnimation: false, fadeAnimation: false })
+    .setView([50.2649, 19.0238], 13);
 
-// Inicjalizacja warstw tras i automatycznej legendy
+const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    crossOrigin: true,
+    attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+L.control.scale({ imperial: false, position: 'bottomright' }).addTo(map);
+
+const routeCanvasRenderer = L.canvas({ padding: 0.5 });
+
 const legendContainer = document.getElementById("routeLegendContainer");
 Object.keys(CONFIG_ROUTES).forEach(key => {
     CONFIG_ROUTES[key].layer = L.geoJSON(null, {
+        renderer: routeCanvasRenderer,
+        // pomijamy waypointy z GPX (inaczej pojawiłyby się domyślne markery)
+        filter: f => f.geometry && f.geometry.type !== 'Point',
         style: { color: CONFIG_ROUTES[key].color, weight: 5 }
     }).addTo(map);
 
     if (legendContainer) {
-        legendContainer.innerHTML += `
-            <div style="color: ${CONFIG_ROUTES[key].color}; font-weight:bold; margin-bottom:2px;">
+        const div = document.createElement("div");
+        div.className = "filter-item";
+        div.innerHTML = `
+            <input type="checkbox" id="route_chk_${key}" checked onchange="toggleRouteLayer('${key}', this.checked)">
+            <label for="route_chk_${key}" style="cursor:pointer; font-weight:bold; color:${CONFIG_ROUTES[key].color};">
                 <i class="fa-solid fa-route"></i> Trasa ${key}
-            </div>
+            </label>
         `;
+        legendContainer.appendChild(div);
     }
 });
+
+function toggleRouteLayer(key, isVisible) {
+    const layer = CONFIG_ROUTES[key].layer;
+    if (isVisible) {
+        if (!map.hasLayer(layer)) layer.addTo(map);
+    } else {
+        if (map.hasLayer(layer)) map.removeLayer(layer);
+    }
+}
+
+// Każdy typ punktu ma własną grupę warstw (filtrowanie = dodanie/usunięcie grupy)
+const typeGroups = {};
+Object.keys(CONFIG_TYPES).forEach(t => { typeGroups[t] = L.layerGroup(); });
 
 let pointsMap = new Map();
 let activeFilters = {};
 let isFirstLoad = true;
 
-// Zmienne obsługi GPS
-let myLocationMarker = null;
-let myLocationCircle = null;
+function getIconHtml(cfg) {
+    if (cfg.svgContent) return cfg.svgContent;
+    return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='#ffffff'><circle cx='12' cy='12' r='10'/></svg>`;
+}
+
+// ---------- Moja lokalizacja (tylko na tym urządzeniu) ----------
+const GPS_DEFAULT_MSG = "Pozycja jest widoczna tylko na tym urządzeniu i nie jest nigdzie wysyłana.";
 let watchId = null;
+let myMarker = null;
+let myAccuracyCircle = null;
+let firstFix = true;
+
+function setGpsStatus(msg, isError) {
+    const el = document.getElementById("gpsStatus");
+    el.innerText = msg;
+    el.className = isError ? "error" : "";
+}
+
+function resetGpsButton() {
+    const btn = document.getElementById("locate-btn");
+    btn.innerHTML = `<i class="fa-solid fa-crosshairs"></i> Pokaż moją lokalizację`;
+    btn.style.background = "#28a745";
+    document.getElementById("center-btn").style.display = "none";
+}
+
+function stopGPS() {
+    if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+    }
+    if (myMarker) { map.removeLayer(myMarker); myMarker = null; }
+    if (myAccuracyCircle) { map.removeLayer(myAccuracyCircle); myAccuracyCircle = null; }
+    resetGpsButton();
+}
+
+function centerOnMe() {
+    if (myMarker) map.setView(myMarker.getLatLng(), Math.max(map.getZoom(), 17));
+}
 
 function toggleGPS() {
     const btn = document.getElementById("locate-btn");
 
     if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId);
-        watchId = null;
-        
-        if (myLocationMarker) { map.removeLayer(myLocationMarker); myLocationMarker = null; }
-        if (myLocationCircle) { map.removeLayer(myLocationCircle); myLocationCircle = null; }
-        
-        btn.innerHTML = `<i class="fa-solid fa-crosshairs"></i> Włącz moją lokalizację (GPS)`;
-        btn.style.background = "#28a745";
-        btn.style.color = "#fff";
-    } else {
-        if (!navigator.geolocation) {
-            alert("Twoja przeglądarka lub urządzenie nie obsługuje geolokalizacji.");
-            return;
-        }
-
-        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Szukam sygnału GPS...`;
-        btn.style.background = "#ffc107";
-        btn.style.color = "#000";
-
-        watchId = navigator.geolocation.watchPosition(
-            (pos) => {
-                const lat = pos.coords.latitude;
-                const lng = pos.coords.longitude;
-                const accuracy = pos.coords.accuracy;
-
-                if (!myLocationMarker) {
-                    myLocationMarker = L.circleMarker([lat, lng], {
-                        radius: 8,
-                        fillColor: "#007bff",
-                        color: "#ffffff",
-                        weight: 3,
-                        opacity: 1,
-                        fillOpacity: 0.9
-                    }).addTo(map).bindPopup("<b>Twoja obecna pozycja</b>");
-
-                    myLocationCircle = L.circle([lat, lng], {
-                        radius: accuracy,
-                        color: "#007bff",
-                        fillColor: "#007bff",
-                        fillOpacity: 0.15,
-                        weight: 1
-                    }).addTo(map);
-
-                    map.setView([lat, lng], 16);
-                } else {
-                    myLocationMarker.setLatLng([lat, lng]);
-                    myLocationCircle.setLatLng([lat, lng]);
-                    myLocationCircle.setRadius(accuracy);
-                }
-
-                btn.innerHTML = `<i class="fa-solid fa-location-dot"></i> Wyłącz śledzenie GPS`;
-                btn.style.background = "#dc3545";
-                btn.style.color = "#fff";
-            },
-            (err) => {
-                alert("Nie udało się pobrać lokalizacji. Upewnij się, że zezwoliłeś na dostęp do GPS.");
-                toggleGPS();
-            },
-            {
-                enableHighAccuracy: true,
-                maximumAge: 5000,
-                timeout: 10000
-            }
-        );
+        stopGPS();
+        setGpsStatus(GPS_DEFAULT_MSG);
+        return;
     }
+
+    if (!navigator.geolocation) {
+        setGpsStatus("To urządzenie nie obsługuje geolokalizacji.", true);
+        return;
+    }
+    if (!window.isSecureContext) {
+        setGpsStatus("GPS działa tylko przez HTTPS lub localhost. Otwórz stronę przez adres https://... albo http://localhost:...", true);
+        return;
+    }
+
+    firstFix = true;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Szukam sygnału GPS...`;
+    setGpsStatus("Szukam sygnału GPS...");
+
+    watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+            const lat = pos.coords.latitude, lng = pos.coords.longitude, accuracy = pos.coords.accuracy;
+
+            btn.innerHTML = `<i class="fa-solid fa-location-dot"></i> Ukryj moją lokalizację`;
+            btn.style.background = "#dc3545";
+            document.getElementById("center-btn").style.display = "block";
+
+            if (!myMarker) {
+                const icon = L.divIcon({
+                    className: 'custom-marker-icon icon-live-user',
+                    html: SVG_LIVE_USER, iconSize: [26, 26], iconAnchor: [13, 13]
+                });
+                myMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 }).addTo(map);
+                myMarker.bindPopup("<b>Tu jesteś</b>");
+                myAccuracyCircle = L.circle([lat, lng], {
+                    radius: accuracy, color: '#e83e8c', weight: 1, fillColor: '#e83e8c', fillOpacity: 0.12
+                }).addTo(map);
+            } else {
+                myMarker.setLatLng([lat, lng]);
+                myAccuracyCircle.setLatLng([lat, lng]);
+                myAccuracyCircle.setRadius(accuracy);
+            }
+
+            if (firstFix) {            // przy pierwszym odczycie pokaż użytkownika na mapie
+                firstFix = false;
+                map.setView([lat, lng], Math.max(map.getZoom(), 17));
+            }
+            setGpsStatus(`Twoja pozycja jest na mapie (dokładność ±${Math.round(accuracy)} m).`);
+        },
+        (err) => {
+            if (err.code === 1) {      // odmowa uprawnień - dalsze próby nie mają sensu
+                stopGPS();
+                setGpsStatus("Brak zgody na lokalizację. Zezwól na dostęp do lokalizacji w ustawieniach przeglądarki.", true);
+            } else {                   // chwilowy brak sygnału - próbujemy dalej
+                setGpsStatus("Chwilowy brak sygnału GPS, próbuję dalej...", true);
+            }
+        },
+        { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 }
+    );
 }
 
+// ---------- UI ----------
 function toggleMobileView() {
     const body = document.body;
     const btn = document.getElementById("toggle-view-btn");
@@ -398,11 +564,15 @@ function initFilters() {
     container.innerHTML = "";
     Object.keys(CONFIG_TYPES).forEach(type => {
         activeFilters[type] = true;
+        typeGroups[type].addTo(map);
+        const cfg = CONFIG_TYPES[type];
+        const iconContent = getIconHtml(cfg);
+
         const div = document.createElement("div");
         div.className = "filter-item";
         div.innerHTML = `
             <input type="checkbox" id="filter_${type}" checked onchange="toggleFilter('${type}', this.checked)">
-            <span style="display:inline-block; width:14px; text-align:center; margin-right:5px; color:${CONFIG_TYPES[type].color};"><i class="${CONFIG_TYPES[type].faIcon}"></i></span>
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; margin-right:5px; color:${cfg.color};">${iconContent}</span>
             <label for="filter_${type}" style="cursor:pointer; font-weight:bold;">${type}</label>
         `;
         container.appendChild(div);
@@ -412,97 +582,95 @@ initFilters();
 
 function toggleFilter(type, isVisible) {
     activeFilters[type] = isVisible;
-    pointsMap.forEach(p => {
-        if (p.typ === type) {
-            if (isVisible) { if (!map.hasLayer(p.marker)) p.marker.addTo(map); }
-            else { if (map.hasLayer(p.marker)) map.removeLayer(p.marker); }
-        }
-    });
+    if (isVisible) { if (!map.hasLayer(typeGroups[type])) typeGroups[type].addTo(map); }
+    else { if (map.hasLayer(typeGroups[type])) map.removeLayer(typeGroups[type]); }
     refreshList();
     updateStats();
 }
 
+// ---------- Ładowanie danych ----------
 async function loadGpxRoutes() {
-    for (const key of Object.keys(CONFIG_ROUTES)) {
+    await Promise.all(Object.keys(CONFIG_ROUTES).map(async key => {
         try {
-            const randToken = Math.random().toString(36).substring(2);
-            const response = await fetch(`${CONFIG_ROUTES[key].file}?v=${randToken}`);
-            if (!response.ok) throw new Error();
+            const response = await fetch(CONFIG_ROUTES[key].file, { cache: 'no-cache' });
+            if (!response.ok) throw new Error("HTTP " + response.status);
             const gpxText = await response.text();
-            const parser = new DOMParser();
-            const gpxXml = parser.parseFromString(gpxText, "text/xml");
+            const gpxXml = new DOMParser().parseFromString(gpxText, "text/xml");
             const geojson = toGeoJSON.gpx(gpxXml);
             CONFIG_ROUTES[key].layer.clearLayers();
             CONFIG_ROUTES[key].layer.addData(geojson);
-        } catch (e) { }
-    }
+        } catch (e) {
+            console.warn(`Nie wczytano trasy ${key} (${CONFIG_ROUTES[key].file}):`, e.message);
+        }
+    }));
+}
+
+function normalizeType(typ) {
+    if (typ === "Wolontariusz") return "Służba informacyjna";
+    if (typ === "Ochrona") return "Służba porządkowa";
+    if (typ === "Kierowanie ruchem" || typ === "Policja") return "Służba kierowania ruchem";
+    if (typ === "Płoty") return "Barierki";
+    if (typ === "Lider" || typ === "Koordynator") return "Taśma";
+    return typ;
 }
 
 async function syncPointsData() {
-    const badge = document.getElementById("live-sync-badge");
-    badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Pobieranie...`;
-    
     try {
-        const antiCacheString = Math.random().toString(36).substring(2, 10);
-        const response = await fetch(`punkty.json?nocache=${antiCacheString}`, {
-            method: 'GET',
-            headers: {
-                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                'Pragma': 'no-cache',
-                'Expires': '0'
-            }
-        });
-        
-        if (!response.ok) throw new Error("Nie znaleziono pliku");
+        const response = await fetch('punkty.json', { cache: 'no-cache' });
+        if (!response.ok) throw new Error("HTTP " + response.status);
         const data = await response.json();
-        
-        if (data.projectName) {
-            document.getElementById("projectTitle").innerText = data.projectName;
-        }
+
+        if (data.projectName) document.getElementById("projectTitle").innerText = data.projectName;
 
         const pointsArray = data.points || (Array.isArray(data) ? data : []);
         const incomingIds = new Set();
+        let skipped = 0;
 
         pointsArray.forEach((p, index) => {
-            let typ = p.typ;
-            if (typ === "Policja") typ = "Kierowanie ruchem";
-            if (typ === "Koordynator") typ = "Lider";
-            if (!CONFIG_TYPES[typ]) return;
+            try {
+                const typ = normalizeType(p.typ);
+                if (!CONFIG_TYPES[typ]) { skipped++; console.warn("Nieznany typ punktu:", p.typ, p); return; }
 
-            const pointId = p.id || p.numer || `pt_${index}`;
-            incomingIds.add(pointId);
+                const lat = Number(p.lat), lng = Number(p.lng);
+                if (p.lat === null || p.lat === "" || p.lng === null || p.lng === "" ||
+                    !Number.isFinite(lat) || !Number.isFinite(lng)) {
+                    skipped++; console.warn("Punkt bez poprawnych współrzędnych:", p); return;
+                }
 
-            const safeData = {
-                id: pointId,
-                typ: typ,
-                numer: escapeHtml(p.numer || ""),
-                sektor: escapeHtml(p.sektor || ""),
-                liczba_osob: Number(p.liczba_osob) || 0,
-                telefon: escapeHtml(p.telefon || ""),
-                uwagi: escapeHtml(p.uwagi || ""),
-                lat: Number(p.lat),
-                lng: Number(p.lng)
-            };
+                const pointId = String(p.id || (p.numer ? `${typ}:${p.numer}` : `pt_${index}`));
+                incomingIds.add(pointId);
 
-            if (pointsMap.has(pointId)) {
-                updateExistingMarker(pointId, safeData);
-            } else {
-                createNewMarker(pointId, safeData);
+                const safeData = {
+                    id: pointId, typ: typ, numer: escapeHtml(String(p.numer || "")),
+                    numerRaw: String(p.numer || ""),
+                    telefonRaw: String(p.telefon || ""),
+                    // tekst zadania do druku: pole "zadanie", a gdy go brak - dotychczasowe "uwagi"
+                    zadanieDruk: String(p.zadanie || p.uwagi || "").trim(),
+                    zadanie: escapeHtml(String(p.zadanie || "")),
+                    sektor: escapeHtml(String(p.sektor || "")), liczba_osob: Number(p.liczba_osob) || 0,
+                    telefon: escapeHtml(String(p.telefon || "")), uwagi: escapeHtml(String(p.uwagi || "")),
+                    lat, lng
+                };
+
+                if (pointsMap.has(pointId)) updateExistingMarker(pointId, safeData);
+                else createNewMarker(pointId, safeData);
+            } catch (e) {
+                skipped++;
+                console.error("Błąd przetwarzania punktu:", p, e);
             }
         });
 
         pointsMap.forEach((point, id) => {
             if (!incomingIds.has(id)) {
-                map.removeLayer(point.marker);
+                typeGroups[point.typ].removeLayer(point.marker);
                 pointsMap.delete(id);
             }
         });
 
-        document.getElementById("loading-status").style.display = "none";
-        badge.style.background = "#e6f4ea";
-        badge.style.color = "#137333";
-        badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Live: OK`;
-        
+        setDataBadge('ok', `Dane: OK ${timeNow()}`);
+        if (skipped > 0) setLoadingStatus(`Pominięto ${skipped} punktów z błędnymi danymi (szczegóły w konsoli F12).`, true);
+        else setLoadingStatus(null);
+
         refreshList();
         updateStats();
 
@@ -510,116 +678,97 @@ async function syncPointsData() {
             fitMapToAll();
             isFirstLoad = false;
         }
-
     } catch (e) {
-        badge.style.background = "#fce8e6";
-        badge.style.color = "#c5221f";
-        badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Błąd Live`;
-        if (isFirstLoad) {
-            document.getElementById("loading-status").innerHTML = `<span style="color:red;"><i class="fa-solid fa-triangle-exclamation"></i> Brak pliku 'punkty.json'.</span>`;
-            document.getElementById("projectTitle").innerText = "Brak pliku danych";
-        }
+        console.error("Błąd synchronizacji punktów:", e);
+        setDataBadge('error', `Dane: błąd ${timeNow()}`);
+        setLoadingStatus(`Nie udało się wczytać punkty.json (${e.message}). Wyświetlam ostatnie poprawne dane.`, true);
     }
 }
 
-function getPopupContent(cfg, typ, safeData) {
-    return `
-        <div class="popup-view" style="width:220px">
-            <b style="color:${cfg.color};"><i class="${cfg.faIcon}"></i> ${typ}</b>
-            <div><b>ID:</b> ${safeData.numer}</div>
-            ${safeData.sektor ? `<div><b>Sektor:</b> ${safeData.sektor}</div>` : ''}
-            <div><b>Obsada:</b> ${safeData.liczba_osob} os.</div>
-            ${safeData.telefon ? `<div><b>Tel:</b> <a href="tel:${safeData.telefon}">${safeData.telefon}</a></div>` : ''}
-            ${safeData.uwagi ? `<div style="margin-top:5px; border-top:1px solid #eee; padding-top:3px; font-style:italic; color:#555;">${safeData.uwagi}</div>` : ''}
-        </div>
-    `;
+function popupHtml(p) {
+    let h = `<b>${p.typ}</b> - ${p.numer}<br>Obsada: ${p.liczba_osob} os.`;
+    if (p.sektor) h += `<br>Sektor: ${p.sektor}`;
+    if (p.zadanie) h += `<br><b>Zadanie:</b> ${p.zadanie}`;
+    if (p.telefon) h += `<br>Tel: ${p.telefon}`;
+    if (p.uwagi) h += `<br>Uwagi: ${p.uwagi}`;
+    return h;
+}
+
+function buildIcon(typ) {
+    const cfg = CONFIG_TYPES[typ];
+    return L.divIcon({
+        className: `custom-marker-icon ${cfg.className}`,
+        html: getIconHtml(cfg),
+        iconSize: [26, 26],
+        iconAnchor: [13, 13]
+    });
 }
 
 function createNewMarker(id, p) {
-    const cfg = CONFIG_TYPES[p.typ];
-    const customIcon = L.divIcon({
-        className: `custom-marker-icon ${cfg.className}`,
-        html: `<div><i class="${cfg.faIcon}"></i></div>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
-    });
-
-    const marker = L.marker([p.lat, p.lng], { icon: customIcon });
-    marker.bindPopup(getPopupContent(cfg, p.typ, p));
-
-    if (activeFilters[p.typ]) {
-        marker.addTo(map);
-    }
-
+    const marker = L.marker([p.lat, p.lng], { icon: buildIcon(p.typ) });
+    marker.bindPopup(popupHtml(p));
+    typeGroups[p.typ].addLayer(marker);
     pointsMap.set(id, { ...p, marker });
 }
 
 function updateExistingMarker(id, p) {
     const existing = pointsMap.get(id);
-    const cfg = CONFIG_TYPES[p.typ];
 
-    if (existing.lat !== p.lat || existing.lng !== p.lng) {
-        existing.marker.setLatLng([p.lat, p.lng]);
+    if (existing.typ !== p.typ) { // zmiana typu = nowa ikona i nowa grupa
+        typeGroups[existing.typ].removeLayer(existing.marker);
+        pointsMap.delete(id);
+        createNewMarker(id, p);
+        return;
     }
-
-    existing.marker.setPopupContent(getPopupContent(cfg, p.typ, p));
+    if (existing.lat !== p.lat || existing.lng !== p.lng) existing.marker.setLatLng([p.lat, p.lng]);
+    existing.marker.setPopupContent(popupHtml(p));
     pointsMap.set(id, { ...p, marker: existing.marker });
 }
 
 function fitMapToAll() {
     const bounds = L.latLngBounds([]);
-    let hasData = false;
     Object.keys(CONFIG_ROUTES).forEach(key => {
-        const layer = CONFIG_ROUTES[key].layer;
-        if (layer.getLayers().length > 0) {
-            bounds.extend(layer.getBounds());
-            hasData = true;
+        if (CONFIG_ROUTES[key].layer.getLayers().length > 0) {
+            bounds.extend(CONFIG_ROUTES[key].layer.getBounds());
         }
     });
-    if (pointsMap.size > 0) {
-        pointsMap.forEach(p => bounds.extend([p.lat, p.lng]));
-        hasData = true;
-    }
-    if (hasData) map.fitBounds(bounds);
+    if (bounds.isValid()) map.fitBounds(bounds);
 }
 
 function refreshList() {
     let html = "";
+    let visibleCount = 0;
     const searchVal = document.getElementById("searchPointInput").value.toLowerCase().trim();
 
     pointsMap.forEach((p, id) => {
         if (!activeFilters[p.typ]) return;
         if (searchVal && !p.numer.toLowerCase().includes(searchVal)) return;
 
-        html += `
-        <div class="pointItem" onclick="focusPoint('${id}')" style="border-left: 5px solid ${CONFIG_TYPES[p.typ].color};">
-            <b><i class="${CONFIG_TYPES[p.typ].faIcon}"></i> ${p.typ}</b> - <span style="font-weight:bold;">${p.numer}</span>
-            ${p.sektor ? `<span class="badge-sector">Sek: ${p.sektor}</span>` : ''}
-            <br>
-            <small style="display:block; margin:2px 0; color:#555;">
-                ${p.liczba_osob ? `Obsada: <b>${p.liczba_osob} os.</b>` : ''} 
-                ${p.telefon ? ` | Tel: ${p.telefon}` : ''}
-            </small>
-            <small style="color:#666; font-style:italic;">${p.uwagi ? p.uwagi : 'Brak uwag.'}</small>
-        </div>
-        `;
-    });
+        visibleCount++;
+        const cfg = CONFIG_TYPES[p.typ];
+        const iconContent = getIconHtml(cfg);
 
+        html += `
+        <div class="pointItem" data-id="${escapeHtml(id)}" style="border-left: 5px solid ${cfg.color}; display:flex; align-items:center;">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; margin-right:8px; color:${cfg.color};">${iconContent}</span>
+            <div>
+                <b>${p.typ}</b> - <span>${p.numer}</span>
+            </div>
+        </div>`;
+    });
     document.getElementById("pointList").innerHTML = html;
-    
-    let activeCount = 0;
-    pointsMap.forEach(p => { if (activeFilters[p.typ]) activeCount++; });
-    document.getElementById("pointsCount").innerText = activeCount;
+    document.getElementById("pointsCount").innerText = visibleCount;
 }
+
+// delegacja zdarzeń zamiast onclick z id wstrzykiwanym do HTML
+document.getElementById("pointList").addEventListener("click", e => {
+    const item = e.target.closest(".pointItem");
+    if (item) focusPoint(item.dataset.id);
+});
 
 function focusPoint(id) {
     const point = pointsMap.get(id);
     if (!point) return;
-    if (document.body.classList.contains("panel-expanded")) {
-        document.body.classList.remove("panel-expanded");
-        document.getElementById("toggle-view-btn").innerHTML = `<i class="fa-solid fa-list"></i> Pokaż Listę`;
-        setTimeout(() => { map.invalidateSize(); }, 300);
-    }
     map.setView([point.lat, point.lng], 17);
     point.marker.openPopup();
 }
@@ -627,46 +776,759 @@ function focusPoint(id) {
 function searchPoints() { refreshList(); }
 
 function updateStats() {
+    let counts = {};
+    Object.keys(CONFIG_TYPES).forEach(type => { counts[type] = 0; });
+    pointsMap.forEach(p => { if (counts.hasOwnProperty(p.typ)) counts[p.typ]++; });
+
     let html = "";
-    let grandTotalPoints = 0;
-    let grandTotalPeople = 0;
-
-    Object.keys(CONFIG_TYPES).forEach(type => {
-        let countPoints = 0;
-        let countPeople = 0;
-
-        pointsMap.forEach(p => {
-            if (p.typ === type) {
-                countPoints++;
-                countPeople += (p.liczba_osob || 0);
-            }
-        });
-
-        grandTotalPoints += countPoints;
-        grandTotalPeople += countPeople;
-
-        if (countPoints > 0) {
-            html += `<tr><td><span style="color:${CONFIG_TYPES[type].color}; margin-right:5px;"><i class="${CONFIG_TYPES[type].faIcon}"></i></span>${type}</td><td><b>${countPoints}</b></td><td>${countPeople}</td></tr>`;
-        }
-    });
-
-    if (grandTotalPoints > 0) {
-        html += `<tr style="background:#e9ecef; font-weight:bold; border-top:2px solid #ccc;"><td>RAZEM</td><td>${grandTotalPoints}</td><td>${grandTotalPeople}</td></tr>`;
-    } else {
-        html = `<tr><td colspan="3" style="text-align:center; color:#999;">Brak punktów</td></tr>`;
+    for (const [type, count] of Object.entries(counts)) {
+        html += `<tr><td>${type}</td><td><b>${count > 0 ? count : 'brak'}</b></td></tr>`;
     }
     document.getElementById("statTableBody").innerHTML = html;
 }
 
-window.onload = async function() {
+// ---------- GENERATOR ATLASU OPERACYJNEGO ----------
+const ATLAS = {
+    MAP_W_PX: 1047,           // 277 mm przy 96 dpi
+    MAP_H_PX: 510,            // 135 mm przy 96 dpi
+    MM_PER_PX: 0.2645833,     // 1 px CSS = 0.2646 mm na papierze
+    SCALE: 2000,
+    FIT_RATIO: 0.9,           // trasa na stronie ma zajmować max 90% kadru
+    SAMPLE_KM: 0.01,          // próbkowanie trasy co 10 m
+    OVERLAP_SAMPLES: 4,       // nakładka między stronami: 4 x 10 m = 40 m
+    ICON_HALF_PX: 13,         // połowa ikony: punkt ze środkiem do 13 px poza kadrem jest jeszcze częściowo widoczny
+    EDGE_PX: 20,              // punkt ze środkiem do 20 px od krawędzi kadru = "na granicy"
+    OFFROUTE_MAX_M: 1500,     // punkty dalsze niż 1500 m od trasy NIE dostają dodatkowych stron
+    PAGES_PER_FILE: 40,       // dzielenie PDF na części (oszczędność pamięci)
+    MAX_PAGES: 5000
+};
+
+function collectCoords(layer) {
+    const out = [];
+    const valid = c => Array.isArray(c) && c.length >= 2 && Number.isFinite(c[0]) && Number.isFinite(c[1]);
+    layer.toGeoJSON().features.forEach(f => {
+        if (!f.geometry) return;
+        if (f.geometry.type === 'LineString') {
+            f.geometry.coordinates.forEach(c => { if (valid(c)) out.push([c[0], c[1]]); });
+        } else if (f.geometry.type === 'MultiLineString') {
+            f.geometry.coordinates.forEach(seg => seg.forEach(c => { if (valid(c)) out.push([c[0], c[1]]); }));
+        }
+    });
+    return out;
+}
+
+// Próbki trasy co SAMPLE_KM: [{km, lat, lng}]
+function sampleRoute(coords) {
+    const cum = [0];
+    for (let i = 1; i < coords.length; i++) {
+        cum.push(cum[i - 1] + turf.distance(coords[i - 1], coords[i], { units: 'kilometers' }));
+    }
+    const total = cum[cum.length - 1];
+    const samples = [];
+    let k = 0;
+    for (let d = 0; d < total; d += ATLAS.SAMPLE_KM) {
+        while (k < coords.length - 2 && cum[k + 1] < d) k++;
+        const seg = cum[k + 1] - cum[k];
+        const t = seg > 0 ? (d - cum[k]) / seg : 0;
+        samples.push({
+            km: d,
+            lng: coords[k][0] + (coords[k + 1][0] - coords[k][0]) * t,
+            lat: coords[k][1] + (coords[k + 1][1] - coords[k][1]) * t
+        });
+    }
+    const last = coords[coords.length - 1];
+    samples.push({ km: total, lng: last[0], lat: last[1] });
+    return { samples, total };
+}
+
+// Dzieli trasę na strony: każda strona obejmuje tyle trasy, ile mieści się w kadrze.
+function planPages(samples, fitW, fitH) {
+    const extend = (b, s) => ({
+        minLat: Math.min(b.minLat, s.lat), maxLat: Math.max(b.maxLat, s.lat),
+        minLng: Math.min(b.minLng, s.lng), maxLng: Math.max(b.maxLng, s.lng)
+    });
+    const empty = () => ({ minLat: Infinity, maxLat: -Infinity, minLng: Infinity, maxLng: -Infinity });
+    const spanM = b => {
+        const midLat = (b.minLat + b.maxLat) / 2;
+        return {
+            w: (b.maxLng - b.minLng) * 111320 * Math.cos(midLat * Math.PI / 180),
+            h: (b.maxLat - b.minLat) * 110574
+        };
+    };
+
+    const pages = [];
+    let i = 0;
+    while (pages.length < ATLAS.MAX_PAGES) {
+        let b = empty();
+        let j = i;
+        for (let q = i; q < samples.length; q++) {
+            const nb = extend(b, samples[q]);
+            const s = spanM(nb);
+            if (s.w > fitW || s.h > fitH) break;
+            b = nb;
+            j = q;
+        }
+        pages.push({
+            startKm: samples[i].km,
+            endKm: samples[j].km,
+            center: [(b.minLat + b.maxLat) / 2, (b.minLng + b.maxLng) / 2]
+        });
+        if (j >= samples.length - 1) break;
+        i = Math.max(i + 1, j - ATLAS.OVERLAP_SAMPLES);
+    }
+    return pages;
+}
+
+// Czeka aż kafelki bazowe się załadują (z limitem czasu)
+function waitForTiles() {
+    return new Promise(resolve => {
+        let done = false;
+        const finish = () => {
+            if (done) return;
+            done = true;
+            tileLayer.off('load', finish);
+            resolve();
+        };
+        tileLayer.on('load', finish);
+        setTimeout(() => { if (!tileLayer._loading) finish(); }, 400);
+        setTimeout(finish, 12000);
+    });
+}
+
+// Wygląd markerów na wydruku (odpowiada klasom CSS .icon-*): tło i kolor obwódki
+const ATLAS_MARKER_STYLE = {
+    "Służba informacyjna":      { bg: "#ffffff", border: "#007bff" },
+    "Taśma":                    { bg: "#ffffff", border: "#dc3545" },
+    "Służba porządkowa":        { bg: "#ffffff", border: "#d2d826" },
+    "Służba kierowania ruchem": { bg: "#ffffff", border: "#e84824" },
+    "Medyczny":                 { bg: "#28a745", border: "#ffffff" },
+    "Barierki":                 { bg: "#343a40", border: "#f8f9fa" },
+    "Toaleta":                  { bg: "#6f42c1", border: "#ffffff" },
+    "Punkt żywieniowy":         { bg: "#fd7e14", border: "#ffffff" },
+    "Sędzia":                   { bg: "#e0a800", border: "#ffffff" },
+    "Śluza":                    { bg: "#ffffff", border: "#20c997" }
+};
+const ATLAS_MARKER_R_PX = 14;     // promień zewnętrzny markera (px CSS)
+const ATLAS_MARKER_ICON_PX = 16;  // rozmiar ikony w środku (px CSS)
+
+// Rasteryzuje każdą ikonę SVG do obiektu Image (raz na generowanie atlasu)
+async function prepareAtlasIcons() {
+    const icons = {};
+    await Promise.all(Object.keys(CONFIG_TYPES).map(type => new Promise(resolve => {
+        const svg = (CONFIG_TYPES[type].svgContent || "").replace(/width='16' height='16'/, "width='96' height='96'");
+        const img = new Image();
+        img.onload = () => { icons[type] = img; resolve(); };
+        img.onerror = () => { console.warn("Nie udało się wczytać ikony dla typu:", type); icons[type] = null; resolve(); };
+        img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    })));
+    return icons;
+}
+
+function drawAtlasMarker(ctx, x, y, k, type, icons) {
+    const st = ATLAS_MARKER_STYLE[type] || { bg: "#ffffff", border: "#333333" };
+    const r = ATLAS_MARKER_R_PX * k;
+
+    // tło + cień
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.4)';
+    ctx.shadowBlur = 4 * k;
+    ctx.shadowOffsetY = 1 * k;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = st.bg;
+    ctx.fill();
+    ctx.restore();
+
+    // obwódka 2 px
+    ctx.beginPath();
+    ctx.arc(x, y, r - 1 * k, 0, Math.PI * 2);
+    ctx.lineWidth = 2 * k;
+    ctx.strokeStyle = st.border;
+    ctx.stroke();
+
+    // ikona
+    const img = icons[type];
+    if (img) {
+        const s = ATLAS_MARKER_ICON_PX * k;
+        ctx.drawImage(img, x - s / 2, y - s / 2, s, s);
+    }
+}
+
+function newPdf() {
+    const { jsPDF } = window.jspdf;
+    return new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
+}
+
+function drawPageFooter(pdf, mapWidthMm, routeKey, page, pageNo, pageTotal, summary, edgeNotes, tasks) {
+    const tableX = 10, tableY = 148, tableW = mapWidthMm;
+    const headerH = 14, bodyH = 22, notesH = 9, tasksH = 6;
+    const tableH = headerH + bodyH + notesH + tasksH;
+    const bodyEnd = tableY + headerH + bodyH;
+    const midX = tableX + tableW / 2;
+
+    pdf.setDrawColor(0, 0, 0);
+    pdf.setLineWidth(0.2);
+    if (page.extra) pdf.setFillColor(255, 214, 214); else pdf.setFillColor(235, 235, 235);
+    pdf.rect(tableX, tableY, tableW, headerH, 'F');
+    pdf.rect(tableX, tableY, tableW, tableH);
+    pdf.line(tableX, tableY + 7, tableX + tableW, tableY + 7);
+    pdf.line(midX, tableY, midX, tableY + headerH);
+    pdf.line(tableX, tableY + headerH, tableX + tableW, tableY + headerH);
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(9.5);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(removePolishDiacritics(`TRASA ${routeKey}`), tableX + 4, tableY + 5);
+    pdf.text("Skala: 1 : 2 000", midX + 4, tableY + 5);
+    const segmentText = page.extra
+        ? `POZA TRASA: przy km ${page.startKm.toFixed(2)} (ok. ${Math.round(page.distM)} m od trasy)`
+        : `Odcinek: ${page.startKm.toFixed(2)} km - ${page.endKm.toFixed(2)} km`;
+    pdf.text(removePolishDiacritics(segmentText), tableX + 4, tableY + 11.5);
+    pdf.text(`Strona ${pageNo} / ${pageTotal}`, midX + 4, tableY + 11.5);
+
+    // Podsumowanie: 2 bloki, w każdym kolumny "nazwa | liczba"
+    const entries = Object.entries(summary);
+    const rows = Math.max(1, Math.ceil(entries.length / 2));
+    const rowH = bodyH / rows;
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(8);
+    pdf.line(midX, tableY + headerH, midX, bodyEnd);
+
+    const blockW = tableW / 2;
+    const subMidX1 = tableX + blockW * 0.75;
+    const subMidX2 = midX + blockW * 0.75;
+    pdf.setDrawColor(210, 210, 210);
+    pdf.line(subMidX1, tableY + headerH, subMidX1, bodyEnd);
+    pdf.line(subMidX2, tableY + headerH, subMidX2, bodyEnd);
+
+    for (let i = 0; i < rows; i++) {
+        const rowY = tableY + headerH + i * rowH + Math.min(3.4, rowH - 1);
+        if (i > 0) {
+            pdf.setDrawColor(230, 230, 230);
+            pdf.line(tableX, tableY + headerH + i * rowH, tableX + tableW, tableY + headerH + i * rowH);
+        }
+        if (entries[i]) {
+            const [type, count] = entries[i];
+            pdf.text(type, tableX + 3, rowY);
+            pdf.text(count > 0 ? String(count) : "brak", subMidX1 + 3, rowY);
+        }
+        if (entries[i + rows]) {
+            const [type, count] = entries[i + rows];
+            pdf.text(type, midX + 3, rowY);
+            pdf.text(count > 0 ? String(count) : "brak", subMidX2 + 3, rowY);
+        }
+    }
+    // Wiersz "Uwagi": punkty na granicy kadru
+    pdf.setDrawColor(0, 0, 0);
+    pdf.line(tableX, bodyEnd, tableX + tableW, bodyEnd);
+    pdf.setFillColor(255, 243, 205);
+    pdf.rect(tableX, bodyEnd, tableW, notesH, 'F');
+    pdf.rect(tableX, bodyEnd, tableW, notesH);
+
+    const notesText = edgeNotes.length === 0
+        ? "Uwagi: brak punktow na granicy kadru."
+        : `Uwagi - punkty na granicy kadru, moga byc ucieta lub widoczne na sasiedniej stronie (${edgeNotes.length}): ${edgeNotes.join("; ")}`;
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(0, 0, 0);
+    let lines = pdf.splitTextToSize(removePolishDiacritics(notesText), tableW - 6);
+    if (lines.length > 2) {
+        lines = lines.slice(0, 2);
+        lines[1] = lines[1].replace(/.{0,6}$/, "") + " ... (pelna lista: zob. mape)";
+    }
+    pdf.text(lines, tableX + 3, bodyEnd + 3.6);
+
+    // Wiersz "Zadania punktow": zawsze obecny, zeby bylo jasne czy sa uwagi czy ich brak
+    const tasksY = bodyEnd + notesH;
+    pdf.setDrawColor(0, 0, 0);
+    if (tasks.length === 0) pdf.setFillColor(226, 240, 217); else pdf.setFillColor(221, 235, 247);
+    pdf.rect(tableX, tasksY, tableW, tasksH, 'F');
+    pdf.rect(tableX, tasksY, tableW, tasksH);
+    const tasksText = tasks.length === 0
+        ? "Zadania punktow: brak uwag co do zadan."
+        : `Zadania punktow: ${tasks.length} pkt z opisem zadan - patrz nastepna strona (numery: ${tasks.map(t => t.numer).join(", ")})`;
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(0, 0, 0);
+    let tl = pdf.splitTextToSize(removePolishDiacritics(tasksText), tableW - 6)[0];
+    if (tasks.length > 0 && removePolishDiacritics(tasksText).length > tl.length) tl = tl.replace(/.{0,4}$/, "") + "...";
+    pdf.text(tl, tableX + 3, tasksY + 4);
+
+    pdf.setFontSize(7);
+    pdf.setTextColor(90, 90, 90);
+    pdf.text("Dane mapy: (c) OpenStreetMap contributors. Kilometraz liczony z pliku GPX - orientacyjny, nie zastepuje pomiaru atestowanego.", tableX, tableY + tableH + 5);
+    pdf.setTextColor(0, 0, 0);
+}
+
+// Strona(y) z opisem zadan dla punktow widocznych w kadrze. Zwraca liczbe dodanych stron PDF.
+function drawTasksPages(pdf, routeKey, page, pageNo, pageTotal, tasks) {
+    const X = 10, TW = 277;
+    const cols = [
+        { t: 'Numer', w: 28 }, { t: 'Typ', w: 48 }, { t: 'Obsada', w: 16 },
+        { t: 'Telefon', w: 30 }, { t: 'Zadanie / uwagi', w: 155 }
+    ];
+    let added = 0;
+
+    const segText = page.extra
+        ? `POZA TRASA: przy km ${page.startKm.toFixed(2)} (ok. ${Math.round(page.distM)} m od trasy)`
+        : `Odcinek: ${page.startKm.toFixed(2)} km - ${page.endKm.toFixed(2)} km`;
+
+    const startPage = (cont) => {
+        pdf.addPage();
+        added++;
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(11);
+        pdf.setTextColor(0, 0, 0);
+        pdf.text(removePolishDiacritics(`TRASA ${routeKey} - ZADANIA PUNKTOW do mapy ${pageNo} / ${pageTotal}${cont ? ' (cd.)' : ''}`), X, 16);
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(9);
+        pdf.text(removePolishDiacritics(segText), X, 22);
+
+        pdf.setFillColor(235, 235, 235);
+        pdf.setDrawColor(0, 0, 0);
+        pdf.setLineWidth(0.2);
+        pdf.rect(X, 26, TW, 7, 'F');
+        pdf.rect(X, 26, TW, 7);
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(9);
+        let cx = X;
+        cols.forEach(c => { pdf.text(c.t, cx + 2, 30.8); cx += c.w; });
+        return 33;
+    };
+
+    const sorted = tasks.slice().sort((a, b) => a.numer.localeCompare(b.numer, 'pl', { numeric: true }));
+    let y = startPage(false);
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(9);
+    sorted.forEach(t => {
+        const cells = [
+            pdf.splitTextToSize(removePolishDiacritics(t.numer), cols[0].w - 3),
+            pdf.splitTextToSize(removePolishDiacritics(t.typ), cols[1].w - 3),
+            [String(t.osob)],
+            pdf.splitTextToSize(removePolishDiacritics(t.tel || '-'), cols[3].w - 3),
+            pdf.splitTextToSize(removePolishDiacritics(t.zad), cols[4].w - 3)
+        ];
+        const nLines = Math.max(...cells.map(c => c.length));
+        const rowH = 2.5 + nLines * 4;
+
+        if (y + rowH > 198) {
+            y = startPage(true);
+            pdf.setFont("helvetica", "normal");
+            pdf.setFontSize(9);
+        }
+        pdf.setDrawColor(0, 0, 0);
+        pdf.rect(X, y, TW, rowH);
+        let cx = X;
+        cells.forEach((lines, i) => {
+            if (i > 0) pdf.line(cx, y, cx, y + rowH);
+            pdf.text(lines, cx + 2, y + 4.2);
+            cx += cols[i].w;
+        });
+        y += rowH;
+    });
+    return added;
+}
+
+// Etykieta (numer punktu) obok markera, z bialym obrysem dla czytelnosci
+function drawAtlasLabel(ctx, x, y, k, text) {
+    if (!text) return;
+    ctx.save();
+    ctx.font = `bold ${9 * k}px Arial, sans-serif`;
+    ctx.textBaseline = 'middle';
+    const w = ctx.measureText(text).width;
+    const gap = (ATLAS_MARKER_R_PX + 3) * k;
+    const placeLeft = x + gap + w > ctx.canvas.width;
+    ctx.textAlign = placeLeft ? 'right' : 'left';
+    const tx = placeLeft ? x - gap : x + gap;
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 3 * k;
+    ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+    ctx.strokeText(text, tx, y);
+    ctx.fillStyle = '#000000';
+    ctx.fillText(text, tx, y);
+    ctx.restore();
+}
+
+// ---- Własny renderer kadru atlasu (bez html2canvas) ----
+
+// Projekcja Mercatora, współrzędne znormalizowane 0..1 (tak jak kafelki OSM)
+function mercNorm(lat, lng) {
+    const s = Math.sin(lat * Math.PI / 180);
+    return { x: (lng + 180) / 360, y: 0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI) };
+}
+
+function collectSegments(layer) {
+    const valid = c => Array.isArray(c) && c.length >= 2 && Number.isFinite(c[0]) && Number.isFinite(c[1]);
+    const segs = [];
+    layer.toGeoJSON().features.forEach(f => {
+        if (!f.geometry) return;
+        if (f.geometry.type === 'LineString') {
+            segs.push(f.geometry.coordinates.filter(valid));
+        } else if (f.geometry.type === 'MultiLineString') {
+            f.geometry.coordinates.forEach(s => segs.push(s.filter(valid)));
+        }
+    });
+    return segs.filter(s => s.length >= 2);
+}
+
+const atlasTileCache = new Map();
+function loadAtlasTile(z, x, y) {
+    const n = Math.pow(2, z);
+    const xx = ((x % n) + n) % n;
+    if (y < 0 || y >= n) return Promise.resolve(null);
+    const key = `${z}/${xx}/${y}`;
+    if (atlasTileCache.has(key)) return atlasTileCache.get(key);
+
+    const sub = 'abc'[(xx + y) % 3];
+    const p = new Promise(resolve => {
+        let tries = 0;
+        const attempt = () => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => resolve(img);
+            img.onerror = () => {
+                tries++;
+                if (tries < 3) setTimeout(attempt, 400 * tries);
+                else { atlasTileCache.delete(key); resolve(null); }
+            };
+            // przy ponowieniu omijamy ewentualny stary wpis w cache bez nagłówków CORS
+            img.src = `https://${sub}.tile.openstreetmap.org/${key}.png` + (tries ? `?r=${tries}` : '');
+        };
+        attempt();
+    });
+    atlasTileCache.set(key, p);
+    if (atlasTileCache.size > 500) atlasTileCache.delete(atlasTileCache.keys().next().value);
+    return p;
+}
+
+async function drawAtlasBasemap(ctx, k, zf, tlx, tly, W, H) {
+    const zt = Math.min(19, Math.max(0, Math.round(zf + 1)));   // zoom kafelków (ostrzejszy niż zoom kadru)
+    const tileSize = 256 * Math.pow(2, zf - zt);                // rozmiar kafelka w px CSS na kadrze
+    const x0 = Math.floor(tlx / tileSize), x1 = Math.floor((tlx + W) / tileSize);
+    const y0 = Math.floor(tly / tileSize), y1 = Math.floor((tly + H) / tileSize);
+
+    const jobs = [];
+    for (let ty = y0; ty <= y1; ty++) {
+        for (let tx = x0; tx <= x1; tx++) {
+            jobs.push(loadAtlasTile(zt, tx, ty).then(img => ({ img, tx, ty })));
+        }
+    }
+    const tiles = await Promise.all(jobs);
+
+    ctx.fillStyle = '#e5e5e5';
+    ctx.fillRect(0, 0, W * k, H * k);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    let missing = 0;
+    tiles.forEach(({ img, tx, ty }) => {
+        if (!img) { missing++; return; }
+        const dx = (tx * tileSize - tlx) * k, dy = (ty * tileSize - tly) * k;
+        ctx.drawImage(img, dx, dy, tileSize * k + 0.5, tileSize * k + 0.5);
+    });
+    return missing;
+}
+
+function drawAtlasRoutes(ctx, k, routes, world, tlx, tly, W, H) {
+    const M = 12;
+    routes.forEach(r => {
+        ctx.strokeStyle = r.color;
+        ctx.lineWidth = 5 * k;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        r.segs.forEach(seg => {
+            let prev = null, pen = false;
+            for (let i = 0; i < seg.length; i++) {
+                const px = seg[i].x * world - tlx, py = seg[i].y * world - tly;
+                if (prev) {
+                    const out = (px < -M && prev.x < -M) || (px > W + M && prev.x > W + M) ||
+                                (py < -M && prev.y < -M) || (py > H + M && prev.y > H + M);
+                    if (!out) {
+                        if (!pen) { ctx.moveTo(prev.x * k, prev.y * k); pen = true; }
+                        ctx.lineTo(px * k, py * k);
+                    } else pen = false;
+                }
+                prev = { x: px, y: py };
+            }
+        });
+        ctx.stroke();
+    });
+}
+
+// ---- Punkty poza trasą: dodatkowe strony ----
+
+function bboxExtend(b, lat, lng) {
+    return {
+        minLat: Math.min(b.minLat, lat), maxLat: Math.max(b.maxLat, lat),
+        minLng: Math.min(b.minLng, lng), maxLng: Math.max(b.maxLng, lng)
+    };
+}
+function bboxSpanM(b) {
+    const midLat = (b.minLat + b.maxLat) / 2;
+    return {
+        w: (b.maxLng - b.minLng) * 111320 * Math.cos(midLat * Math.PI / 180),
+        h: (b.maxLat - b.minLat) * 110574
+    };
+}
+
+// Parametry kadru (zoom, położenie lewego górnego rogu) dla środka strony
+function atlasFrame(center, metersPerPx) {
+    const zf = Math.log2((156543.03392 * Math.cos(center[0] * Math.PI / 180)) / metersPerPx);
+    const world = 256 * Math.pow(2, zf);
+    const c = mercNorm(center[0], center[1]);
+    return { zf, world, tlx: c.x * world - ATLAS.MAP_W_PX / 2, tly: c.y * world - ATLAS.MAP_H_PX / 2 };
+}
+
+// Najbliższy punkt trasy (po próbkach co 10 m): km wzdłuż trasy i odległość w metrach
+function nearestOnRoute(samples, lat, lng) {
+    const cosLat = Math.cos(lat * Math.PI / 180);
+    let best = Infinity, bestKm = 0;
+    for (let i = 0; i < samples.length; i++) {
+        const dx = (lng - samples[i].lng) * cosLat;
+        const dy = lat - samples[i].lat;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < best) { best = d2; bestKm = samples[i].km; }
+    }
+    return { km: bestKm, distM: Math.sqrt(best) * 111320 };
+}
+
+// Szuka punktów, które nie mieszczą się w żadnym kadrze trasy, ale leżą blisko niej,
+// i grupuje je w dodatkowe strony.
+function planOffRoutePages(samples, routePages, fitW, fitH, metersPerPx) {
+    const W = ATLAS.MAP_W_PX, H = ATLAS.MAP_H_PX, inset = ATLAS.EDGE_PX;
+    const frames = routePages.map(pg => atlasFrame(pg.center, metersPerPx));
+    const cand = [];
+    let tooFar = 0;
+
+    pointsMap.forEach(p => {
+        if (!activeFilters[p.typ]) return;
+        const n = mercNorm(p.lat, p.lng);
+        const covered = frames.some(f => {
+            const x = n.x * f.world - f.tlx, y = n.y * f.world - f.tly;
+            return x >= inset && x <= W - inset && y >= inset && y <= H - inset;
+        });
+        if (covered) return;
+
+        const nr = nearestOnRoute(samples, p.lat, p.lng);
+        if (nr.distM > ATLAS.OFFROUTE_MAX_M) { tooFar++; return; }
+        cand.push({ p, km: nr.km, distM: nr.distM });
+    });
+
+    cand.sort((a, b) => a.km - b.km);
+
+    const clusters = [];
+    cand.forEach(c => {
+        for (const cl of clusters) {
+            const nb = bboxExtend(cl.bbox, c.p.lat, c.p.lng);
+            const s = bboxSpanM(nb);
+            if (s.w <= fitW && s.h <= fitH) {
+                cl.bbox = nb; cl.items.push(c);
+                return;
+            }
+        }
+        clusters.push({ bbox: bboxExtend({ minLat: Infinity, maxLat: -Infinity, minLng: Infinity, maxLng: -Infinity }, c.p.lat, c.p.lng), items: [c] });
+    });
+
+    const pages = clusters.map(cl => ({
+        extra: true,
+        startKm: Math.min(...cl.items.map(i => i.km)),
+        endKm: Math.max(...cl.items.map(i => i.km)),
+        distM: Math.min(...cl.items.map(i => i.distM)),
+        center: [(cl.bbox.minLat + cl.bbox.maxLat) / 2, (cl.bbox.minLng + cl.bbox.maxLng) / 2]
+    }));
+    return { pages, tooFar };
+}
+
+// Dodatkowe strony wstawiane są przy właściwym kilometrze (za stroną trasy o tym samym km)
+function mergeAtlasPages(routePages, extraPages) {
+    const items = routePages.map(p => ({ p, key: p.startKm, order: 0 }))
+        .concat(extraPages.map(p => ({ p, key: p.startKm, order: 1 })));
+    items.sort((a, b) => (a.key - b.key) || (a.order - b.order));
+    return items.map(i => i.p);
+}
+
+async function generateRouteAtlas() {
+    const routeKey = document.getElementById("atlasRouteSelect").value;
+    const routeConfig = CONFIG_ROUTES[routeKey];
+    const progressDiv = document.getElementById("atlasProgress");
+    const generateBtn = document.getElementById("generateAtlasBtn");
+    const cancelBtn = document.getElementById("cancelAtlasBtn");
+
+    if (!routeConfig || !routeConfig.layer || routeConfig.layer.getLayers().length === 0) {
+        alert(`Trasa ${routeKey} nie jest załadowana lub jest pusta!`);
+        return;
+    }
+
+    isAtlasCancelled = false;
+    generateBtn.style.display = "none";
+    cancelBtn.style.display = "block";
+    progressDiv.innerText = "Przygotowywanie i czyszczenie danych trasy...";
+
+    try {
+        const coords = collectCoords(routeConfig.layer);
+        if (coords.length < 2) {
+            throw new Error(`Plik GPX dla trasy ${routeKey} nie zawiera wystarczających współrzędnych.`);
+        }
+
+        // 1 px = 0,2646 mm na papierze = 0,529 m w terenie przy 1:2000
+        const metersPerPx = ATLAS.MM_PER_PX * ATLAS.SCALE / 1000;
+        const W = ATLAS.MAP_W_PX, H = ATLAS.MAP_H_PX;
+        const fitW = W * metersPerPx * ATLAS.FIT_RATIO;
+        const fitH = H * metersPerPx * ATLAS.FIT_RATIO;
+
+        const { samples, total } = sampleRoute(coords);
+        const routePages = planPages(samples, fitW, fitH);
+        const off = planOffRoutePages(samples, routePages, fitW, fitH, metersPerPx);
+        const pages = mergeAtlasPages(routePages, off.pages);
+        progressDiv.innerText = `Trasa ${total.toFixed(2)} km, stron: ${pages.length}` +
+            (off.pages.length ? ` (w tym ${off.pages.length} z punktami poza trasą)` : '') + `. Start...`;
+
+        // Trasy do narysowania: włączone w legendzie, wybrana na wierzchu
+        const routesToDraw = [];
+        Object.keys(CONFIG_ROUTES).forEach(key => {
+            const chk = document.getElementById(`route_chk_${key}`);
+            if (key !== routeKey && !(chk && chk.checked)) return;
+            const segs = collectSegments(CONFIG_ROUTES[key].layer)
+                .map(seg => seg.map(c => mercNorm(c[1], c[0])));
+            if (segs.length) routesToDraw.push({ key, color: CONFIG_ROUTES[key].color, segs });
+        });
+        routesToDraw.sort((a, b) => (a.key === routeKey) - (b.key === routeKey));
+
+        const atlasIcons = await prepareAtlasIcons();
+
+        const SC = 2; // rozdzielczość: 2 px kanwy na 1 px CSS
+        const canvas = document.createElement('canvas');
+        canvas.width = W * SC;
+        canvas.height = H * SC;
+        const ctx = canvas.getContext('2d');
+
+        const mapWidthMm = 297 - 20;
+        const imgHeightMm = 135;
+
+        let pdf = newPdf();
+        let inFile = 0;
+        let part = 1;
+        let missingTotal = 0;
+        const multiPart = pages.length > ATLAS.PAGES_PER_FILE;
+        const savePdf = () => {
+            const suffix = multiPart ? `_czesc${part}` : '';
+            pdf.save(`Atlas_Trasy_${routeKey}_skala_2000${suffix}.pdf`);
+        };
+
+        for (let idx = 0; idx < pages.length; idx++) {
+            if (isAtlasCancelled) break;
+            const page = pages[idx];
+            progressDiv.innerText = `Generowanie strony ${idx + 1} / ${pages.length} (km ${page.startKm.toFixed(2)} - ${page.endKm.toFixed(2)})...`;
+
+            // Ułamkowy zoom dający dokładnie 0,529 m/px na szerokości środka kadru
+            const [cLat, cLng] = page.center;
+            const zf = Math.log2((156543.03392 * Math.cos(cLat * Math.PI / 180)) / metersPerPx);
+            const world = 256 * Math.pow(2, zf);
+            const c = mercNorm(cLat, cLng);
+            const tlx = c.x * world - W / 2;   // lewy górny róg kadru we współrzędnych świata
+            const tly = c.y * world - H / 2;
+
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            missingTotal += await drawAtlasBasemap(ctx, SC, zf, tlx, tly, W, H);
+            if (isAtlasCancelled) break;
+            drawAtlasRoutes(ctx, SC, routesToDraw, world, tlx, tly, W, H);
+
+            // Punkty: rysowanie + zliczanie + wykrywanie granicy kadru w jednej pętli
+            const summary = {};
+            Object.keys(CONFIG_TYPES).forEach(t => { summary[removePolishDiacritics(t)] = 0; });
+            const edgeNotes = [];
+            const tasks = [];
+            const labels = [];
+            const half = ATLAS.ICON_HALF_PX, edge = ATLAS.EDGE_PX;
+
+            pointsMap.forEach(p => {
+                if (!activeFilters[p.typ]) return;
+                const n = mercNorm(p.lat, p.lng);
+                const x = n.x * world - tlx, y = n.y * world - tly;
+                if (x < -half || x > W + half || y < -half || y > H + half) return;
+
+                drawAtlasMarker(ctx, x * SC, y * SC, SC, p.typ, atlasIcons);
+                summary[removePolishDiacritics(p.typ)]++;
+
+                if (p.zadanieDruk) {
+                    const num = p.numerRaw || '(bez numeru)';
+                    tasks.push({ numer: num, typ: p.typ, osob: p.liczba_osob, tel: p.telefonRaw, zad: p.zadanieDruk });
+                    labels.push({ x, y, text: num });
+                }
+
+                const sides = [];
+                if (y < edge) sides.push("gora");
+                if (y > H - edge) sides.push("dol");
+                if (x < edge) sides.push("lewo");
+                if (x > W - edge) sides.push("prawo");
+                if (sides.length) {
+                    edgeNotes.push(`${removePolishDiacritics(p.typ)} ${removePolishDiacritics(p.numerRaw)} (${sides.join("/")})`);
+                }
+            });
+
+            labels.forEach(l => drawAtlasLabel(ctx, l.x * SC, l.y * SC, SC, l.text));
+
+            const imgData = canvas.toDataURL('image/jpeg', 0.88);
+
+            if (inFile >= ATLAS.PAGES_PER_FILE) {
+                savePdf();
+                part++;
+                pdf = newPdf();
+                inFile = 0;
+                await sleep(600);
+            }
+            if (inFile > 0) pdf.addPage();
+            inFile++;
+
+            pdf.addImage(imgData, 'JPEG', 10, 12, mapWidthMm, imgHeightMm, undefined, 'FAST');
+            pdf.setDrawColor(0, 0, 0);
+            pdf.rect(10, 12, mapWidthMm, imgHeightMm);
+
+            drawPageFooter(pdf, mapWidthMm, routeKey, page, idx + 1, pages.length, summary, edgeNotes, tasks);
+            if (tasks.length > 0) {
+                inFile += drawTasksPages(pdf, routeKey, page, idx + 1, pages.length, tasks);
+            }
+        }
+
+        if (!isAtlasCancelled) {
+            if (inFile > 0) {
+                progressDiv.innerText = "Atlas gotowy! Pobieranie pliku...";
+                savePdf();
+            }
+            let msg = multiPart ? `Gotowe! Pobrano ${part} plików PDF.` : "Gotowe!";
+            if (missingTotal > 0) msg += ` Uwaga: nie pobrano ${missingTotal} kafelków mapy (szare pola).`;
+            if (off.tooFar > 0) msg += ` Pominięto ${off.tooFar} pkt oddalonych o więcej niż ${ATLAS.OFFROUTE_MAX_M} m od trasy.`;
+            progressDiv.innerText = msg;
+        } else {
+            progressDiv.innerText = "Generowanie przerwane przez użytkownika.";
+        }
+
+    } catch (e) {
+        console.error("SZCZEGÓŁY BŁĘDU ATLASU:", e);
+        progressDiv.innerText = "Błąd: " + e.message;
+        alert("Błąd generowania atlasu: " + e.message);
+    } finally {
+        atlasTileCache.clear();
+        generateBtn.style.display = "block";
+        cancelBtn.style.display = "none";
+    }
+}
+
+// ---------- Start ----------
+window.onload = async function () {
     await loadGpxRoutes();
     await syncPointsData();
-    
-    setInterval(async () => {
-        await syncPointsData();
-    }, 30000);
+
+    startLoop(syncPointsData, 30000);
+
+    document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) syncPointsData();
+    });
 };
 </script>
-
 </body>
 </html>
